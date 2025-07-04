@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/static/css/user_index.css}">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Danh sách Users</h1>
+
+            <!-- Flash messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="mb-3">
+                <a th:href="@{/users/new}" class="btn btn-primary">Thêm User Mới</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Image</th>
+                        <th>Mobile</th>
+                        <th>Address</th>
+                        <th>Ngày tạo</th>
+<!--                        <th>Thao tác</th>-->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td><img th:src="${user.image}" alt="User Image" class="user-avatar" /></td>
+                        <td th:text="${user.mobile}"></td>
+                        <td th:text="${user.address}"></td>
+                        <td th:text="${#temporals.format(user.created_at, 'dd/MM/yyyy HH:mm')}"></td>
+<!--                        <td>-->
+<!--                            <a th:href="@{'/users/' + ${user.id}}" class="btn btn-sm btn-info">Xem</a>-->
+<!--                            <a th:href="@{'/users/' + ${user.id} + '/edit'}" class="btn btn-sm btn-warning">Sửa</a>-->
+<!--                            <form th:action="@{'/users/' + ${user.id} + '/delete'}" method="post" style="display: inline;">-->
+<!--                                <button type="submit" class="btn btn-sm btn-danger"-->
+<!--                                        onclick="return confirm('Bạn có chắc chắn muốn xóa user này?')">Xóa</button>-->
+<!--                            </form>-->
+<!--                        </td>-->
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
