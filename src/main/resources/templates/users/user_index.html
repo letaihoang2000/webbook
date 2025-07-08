@@ -1,69 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>Danh sách Users</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/static/css/user_index.css}">
+    <title>Bootstrap5 select menu and JavaScript & PHP</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
+<style>
+    body {
+
+background-image: url("../images/bar-backgroud.jpg");
+            background-repeat: no-repeat;
+            background-size:cover;
+            background-attachment: fixed;
+            background-position: 60%;
+            color:white;
+    }
+
+    #ans1,
+    #ans2 {
+        color: white;
+    }
+
+    #submit {
+        background: linear-gradient(to right, rgb(37, 37, 235), rgb(229, 17, 134));
+    }
+
+    #submit:hover {
+        background: linear-gradient(to right, rgb(229, 17, 134), rgb(37, 37, 235));
+    }
+</style>
+
 <body>
-<div class="container mt-4">
+
+<div class="container mt-3">
     <div class="row">
-        <div class="col-md-12">
-            <h1>Danh sách Users</h1>
+        <div class="col-sm-12">
+            <form action="<?php echo htmlspecialchars($_SERVER[" PHP_SELF "]);?>" method="post">
 
-            <!-- Flash messages -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
-            <div class="mb-3">
-                <a th:href="@{/users/new}" class="btn btn-primary">Thêm User Mới</a>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Image</th>
-                        <th>Mobile</th>
-                        <th>Address</th>
-                        <th>Ngày tạo</th>
-<!--                        <th>Thao tác</th>-->
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td><img th:src="${user.image}" alt="User Image" class="user-avatar" /></td>
-                        <td th:text="${user.mobile}"></td>
-                        <td th:text="${user.address}"></td>
-                        <td th:text="${#temporals.format(user.created_at, 'dd/MM/yyyy HH:mm')}"></td>
-<!--                        <td>-->
-<!--                            <a th:href="@{'/users/' + ${user.id}}" class="btn btn-sm btn-info">Xem</a>-->
-<!--                            <a th:href="@{'/users/' + ${user.id} + '/edit'}" class="btn btn-sm btn-warning">Sửa</a>-->
-<!--                            <form th:action="@{'/users/' + ${user.id} + '/delete'}" method="post" style="display: inline;">-->
-<!--                                <button type="submit" class="btn btn-sm btn-danger"-->
-<!--                                        onclick="return confirm('Bạn có chắc chắn muốn xóa user này?')">Xóa</button>-->
-<!--                            </form>-->
-<!--                        </td>-->
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <select class="form-select form-select-lg" id="sel1" name="sellist1">
+                <option value="">テーブルを選んでください</option>
+                <option value="アンケート">アンケート</option>
+                <option value="回答データ">回答データ</option>
+                <option value="回答者">回答者</option>
+                <option value="職員">職員</option>
+                <option value="複数選択回答データ">複数選択回答データ</option>
+                <option value="質問">質問</option>
+                <option value="質問形式種類">質問形式種類</option>
+                <option value="質問選択肢">質問選択肢</option>
+            </select>
+            <button type="submit" class="form-control btn btn-lg text-white  mt-3" id="submit" name="submit" onclick="return confirm('このテーブルでよろしいですか？')">確認する</button>
+            </form>
         </div>
-    </div>
-</div>
+        <div class="row mt-2 text-center">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+            <?php
+   $sel1 = $_POST['sellist1'];
+   if(isset($_POST['submit'])){
+if($sel1 != NULL){
+        include('p3.php');
+   }else{
+print "<h5 class='text-danger'>データを選んでいなかった．</h5>";
+            }
+            }
+            ?>
+
+        </div>></div></div>
 </body>
+
 </html>

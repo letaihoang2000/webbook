@@ -1,0 +1,15 @@
+.book-image {
+            max-width: 60px;
+            max-height: 80px;
+            object-fit: cover;
+        }
+        .description-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .search-container {
+            max-width: 300px;
+            margin-bottom: 1rem;
+        }
