@@ -1,6 +1,6 @@
 package com.example.webbook.controller;
 
-import com.example.webbook.model.User;
+import com.example.webbook.dto.UserInfo;
 import com.example.webbook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,8 +18,8 @@ public class UserController {
 
     @GetMapping
     public String listUsers(Model model) {
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        return "users/user_index";
+        List<UserInfo> usersInfo = userService.getAllUsersInfo();
+        model.addAttribute("users", usersInfo);
+        return "users/admin/user_index";
     }
 }
