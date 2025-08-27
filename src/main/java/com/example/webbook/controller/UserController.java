@@ -11,12 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping("/home")
+    public String adminIndex(){
+        return "users/admin/home";
+    }
+
+    @GetMapping("/users")
     public String listUsers(Model model) {
         List<UserInfo> usersInfo = userService.getAllUsersInfo();
         model.addAttribute("users", usersInfo);

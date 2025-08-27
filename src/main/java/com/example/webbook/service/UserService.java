@@ -19,9 +19,10 @@ public class UserService {
     private ModelMapper modelMapper;
 
     public List<UserInfo> getAllUsersInfo() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllDistinctUsers();
         for (User user : users){
-            System.out.println(user.getUsername());
+            System.out.println("ID: " + user.getId() + ", Username: " + user.getUsername() +
+                    ", Email: " + user.getEmail() + ", Mobile: " + user.getMobile() + ", Address: " + user.getAddress());
         }
         return users.stream()
                 .map(this::convertToUserInfo)
@@ -36,6 +37,4 @@ public class UserService {
         }
         return userInfo;
     }
-
-
 }

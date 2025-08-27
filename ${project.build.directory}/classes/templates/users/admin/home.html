@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <div th:replace="~{fragments/admin_sidebar :: sidebar}"></div>
+
+    <!-- Page Content -->
+    <div id="content" class="p-4 p-md-5">
+        <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
+
+        <h2 class="mb-4">Admin Dashboard</h2>
+        <p>Welcome to the admin dashboard. Manage users and other resources here.</p>
+        <p><a th:href="@{/users}" class="btn btn-primary">View All Users</a></p>
+    </div>
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/popper.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

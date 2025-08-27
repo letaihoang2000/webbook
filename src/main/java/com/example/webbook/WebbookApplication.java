@@ -9,6 +9,4 @@ public class WebbookApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WebbookApplication.class, args);
 	}
-
-    // Konichiwa kimochi
 }
