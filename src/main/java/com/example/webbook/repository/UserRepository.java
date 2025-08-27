@@ -10,6 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-    @Query("SELECT DISTINCT u FROM User u")
-    List<User> findAllDistinctUsers();
+    @Query("SELECT u FROM User u JOIN u.role r WHERE r.roleName != 'ADMIN'")
+    List<User> findUsersExcludingAdmin();
 }

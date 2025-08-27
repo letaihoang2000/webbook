@@ -19,11 +19,7 @@ public class UserService {
     private ModelMapper modelMapper;
 
     public List<UserInfo> getAllUsersInfo() {
-        List<User> users = userRepository.findAllDistinctUsers();
-        for (User user : users){
-            System.out.println("ID: " + user.getId() + ", Username: " + user.getUsername() +
-                    ", Email: " + user.getEmail() + ", Mobile: " + user.getMobile() + ", Address: " + user.getAddress());
-        }
+        List<User> users = userRepository.findUsersExcludingAdmin();
         return users.stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
