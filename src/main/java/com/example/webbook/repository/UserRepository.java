@@ -12,4 +12,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u JOIN u.role r WHERE r.roleName != 'ADMIN'")
     List<User> findUsersExcludingAdmin();
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.email = :email")
+    boolean existsByEmail(String email);
 }

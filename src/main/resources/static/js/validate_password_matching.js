@@ -1,9 +1,23 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const addUserModal = document.getElementById('addUserForm');
     const form = addUserModal.querySelector('form');
     const passwordField = document.getElementById('password');
     const confirmPasswordField = document.getElementById('confirm_password');
+
+    // Add error message div to modal header
+    const modalBody = addUserModal.querySelector('.modal-body');
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'formErrorMessage';
+    errorDiv.className = 'alert alert-danger';
+    errorDiv.style.display = 'none';
+    modalBody.insertBefore(errorDiv, modalBody.firstChild);
+
+    // Add success message div
+    const successDiv = document.createElement('div');
+    successDiv.id = 'formSuccessMessage';
+    successDiv.className = 'alert alert-success';
+    successDiv.style.display = 'none';
+    modalBody.insertBefore(successDiv, modalBody.firstChild);
 
     // Add password strength indicator
     const passwordStrengthDiv = document.createElement('div');
@@ -53,8 +67,54 @@ document.addEventListener('DOMContentLoaded', function() {
         .form-control.is-invalid ~ .invalid-feedback {
             display: block;
         }
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        .btn-loading:after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+        @keyframes button-loading-spinner {
+            from { transform: rotate(0turn); }
+            to { transform: rotate(1turn); }
+        }
     `;
     document.head.appendChild(style);
+
+    // Function to show error message
+    function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        successDiv.style.display = 'none';
+        // Scroll to top of modal to show error
+        modalBody.scrollTop = 0;
+    }
+
+    // Function to show success message
+    function showSuccess(message) {
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+        modalBody.scrollTop = 0;
+    }
+
+    // Function to hide messages
+    function hideMessages() {
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+    }
 
     // Password validation functions
     function calculatePasswordStrength(password) {
@@ -216,56 +276,43 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
 
-    async function submitUser(userData) {
-        try {
-            const response = await fetch('/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(userData)
-            });
+    // AJAX form submission
+    function submitForm(formData) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
 
-            if (response.ok) {
-                const result = await response.json();
-                alert('User created successfully!');
-                form.reset();
+        // Show loading state
+        submitButton.textContent = 'Creating...';
+        submitButton.classList.add('btn-loading');
+        submitButton.disabled = true;
 
-                // Clear validation classes
-                form.querySelectorAll('.form-control').forEach(field => {
-                    field.classList.remove('is-valid', 'is-invalid');
-                });
-                passwordStrengthDiv.innerHTML = '';
-
-                // Close modal (Bootstrap 4 syntax as per your original code)
-                $('#addUserForm').modal('hide');
-
-                // Optionally reload the page or update user list
-                // window.location.reload();
-
+        fetch('/user/add', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                setTimeout(() => {
+                    $('#addUserForm').modal('hide');
+                    // Reload the page to show the new user
+                    window.location.reload();
+                }, 2000);
             } else {
-                const error = await response.json();
-                if (typeof error === 'object') {
-                    // Handle field-specific errors
-                    Object.keys(error).forEach(field => {
-                        const fieldElement = document.querySelector(`[name="${field}"], #${field}`);
-                        if (fieldElement) {
-                            setFieldInvalid(fieldElement);
-                            const feedback = fieldElement.parentNode.querySelector('.invalid-feedback');
-                            if (feedback) {
-                                feedback.textContent = error[field];
-                            }
-                        }
-                    });
-                } else {
-                    alert('Error: ' + (error.message || 'Failed to create user'));
-                }
+                showError(data.message);
             }
-        } catch (error) {
+        })
+        .catch(error => {
             console.error('Error:', error);
-            alert('Network error occurred. Please try again.');
-        }
+            showError('An error occurred while creating the user. Please try again.');
+        })
+        .finally(() => {
+            // Reset button state
+            submitButton.textContent = originalText;
+            submitButton.classList.remove('btn-loading');
+            submitButton.disabled = false;
+        });
     }
 
     // Event listeners
@@ -278,33 +325,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     confirmPasswordField.addEventListener('input', validatePasswordMatch);
 
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return;
+    // Clear email validation when user starts typing
+    document.getElementById('emailAddress').addEventListener('input', function() {
+        if (this.classList.contains('is-invalid')) {
+            this.classList.remove('is-invalid');
+            const feedback = this.parentNode.querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '';
+            }
         }
-
-        // Prepare user data
-        const userData = {
-            first_name: document.getElementById('firstName').value.trim(),
-            last_name: document.getElementById('lastName').value.trim(),
-            email: document.getElementById('emailAddress').value.trim(),
-            mobile: document.getElementById('mobile').value.trim(),
-            address: document.getElementById('address').value.trim(),
-            password: passwordField.value
-        };
-
-        submitUser(userData);
     });
 
-    // Clear validation on modal show
+    // Form submission with AJAX
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Always prevent default form submission
+
+        hideMessages(); // Hide any previous messages
+
+        if (!validateForm()) {
+            showError('Please fix the validation errors before submitting.');
+            return false;
+        }
+
+        // Create FormData object
+        const formData = new FormData(form);
+
+        // Submit via AJAX
+        submitForm(formData);
+    });
+
+    // Clear validation and messages on modal show
     $('#addUserForm').on('show.bs.modal', function() {
         form.reset();
         form.querySelectorAll('.form-control').forEach(field => {
             field.classList.remove('is-valid', 'is-invalid');
         });
         passwordStrengthDiv.innerHTML = '';
+        hideMessages();
     });
 });
