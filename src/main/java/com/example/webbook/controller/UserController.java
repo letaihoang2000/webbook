@@ -36,23 +36,23 @@ public class UserController {
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> createUser(@ModelAttribute AddUserForm addUserForm) {
+
         Map<String, Object> response = new HashMap<>();
 
         try {
             User newUser = userService.createUser(addUserForm);
             response.put("success", true);
             response.put("message", "User created successfully!");
+            response.put("userId", newUser.getId().toString());
             return ResponseEntity.ok(response);
 
         } catch (EmailAlreadyExistsException e) {
-            // Handle email already exists specifically
             response.put("success", false);
             response.put("errorType", "email");
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
 
         } catch (Exception e) {
-            // Handle all other exceptions
             response.put("success", false);
             response.put("errorType", "general");
             response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while creating the user.");

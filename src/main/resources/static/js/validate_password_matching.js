@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = addUserModal.querySelector('form');
     const passwordField = document.getElementById('password');
     const confirmPasswordField = document.getElementById('confirm_password');
+    const imageFileInput = document.getElementById('imageFile');
 
     // Add error message div to modal header
     const modalBody = addUserModal.querySelector('.modal-body');
@@ -19,6 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
     successDiv.style.display = 'none';
     modalBody.insertBefore(successDiv, modalBody.firstChild);
 
+    // Add image preview
+    const imagePreview = document.createElement('div');
+    imagePreview.id = 'imagePreview';
+    imagePreview.className = 'mt-2';
+    imagePreview.style.display = 'none';
+    imageFileInput.parentNode.appendChild(imagePreview);
+
     // Add password strength indicator
     const passwordStrengthDiv = document.createElement('div');
     passwordStrengthDiv.id = 'passwordStrength';
@@ -31,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     confirmPasswordFeedback.textContent = 'Passwords do not match.';
     confirmPasswordField.parentNode.appendChild(confirmPasswordFeedback);
 
-    // CSS styles for validation
+    // CSS styles for validation and image preview
     const style = document.createElement('style');
     style.textContent = `
         .password-strength {
@@ -41,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .strength-weak { color: #dc3545; }
         .strength-medium { color: #ffc107; }
         .strength-strong { color: #28a745; }
+
         .form-control.is-invalid {
             border-color: #dc3545;
             padding-right: calc(1.5em + 0.75rem);
@@ -67,6 +76,24 @@ document.addEventListener('DOMContentLoaded', function() {
         .form-control.is-invalid ~ .invalid-feedback {
             display: block;
         }
+
+        .image-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
         .btn-loading {
             position: relative;
             pointer-events: none;
@@ -93,12 +120,69 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
+    // Image file validation and preview
+    function validateImageFile(file) {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!allowedTypes.includes(file.type)) {
+            return 'Please select a valid image file (JPG, PNG, GIF, WEBP).';
+        }
+
+        if (file.size > maxSize) {
+            return 'Image file size must be less than 5MB.';
+        }
+
+        return null;
+    }
+
+    function showImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.innerHTML = `
+                <div class="image-preview-container">
+                    <img src="${e.target.result}" alt="Avatar Preview" class="image-preview">
+                    <p class="text-muted mt-2 mb-0 small">${file.name}</p>
+                    <p class="text-muted mb-0 small">${(file.size / 1024).toFixed(1)} KB</p>
+                </div>
+            `;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Image file input change handler
+    imageFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+
+        if (file) {
+            const errorMessage = validateImageFile(file);
+
+            if (errorMessage) {
+                setFieldInvalid(imageFileInput);
+                let feedback = imageFileInput.parentNode.querySelector('.invalid-feedback');
+                if (!feedback) {
+                    feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    imageFileInput.parentNode.appendChild(feedback);
+                }
+                feedback.textContent = errorMessage;
+                imagePreview.style.display = 'none';
+            } else {
+                setFieldValid(imageFileInput);
+                showImagePreview(file);
+            }
+        } else {
+            imagePreview.style.display = 'none';
+            imageFileInput.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+
     // Function to show error message
     function showError(message) {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
         successDiv.style.display = 'none';
-        // Scroll to top of modal to show error
         modalBody.scrollTop = 0;
     }
 
@@ -262,6 +346,22 @@ document.addEventListener('DOMContentLoaded', function() {
             setFieldValid(mobileField);
         }
 
+        // Validate image file if selected
+        if (imageFileInput.files.length > 0) {
+            const errorMessage = validateImageFile(imageFileInput.files[0]);
+            if (errorMessage) {
+                setFieldInvalid(imageFileInput);
+                let feedback = imageFileInput.parentNode.querySelector('.invalid-feedback');
+                if (!feedback) {
+                    feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    imageFileInput.parentNode.appendChild(feedback);
+                }
+                feedback.textContent = errorMessage;
+                isValid = false;
+            }
+        }
+
         // Validate password
         if (!passwordField.value || passwordField.value.length < 8) {
             setFieldInvalid(passwordField);
@@ -296,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showSuccess(data.message);
                 setTimeout(() => {
                     $('#addUserForm').modal('hide');
-                    // Reload the page to show the new user
                     window.location.reload();
                 }, 2000);
             } else {
@@ -338,16 +437,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form submission with AJAX
     form.addEventListener('submit', function(e) {
-        e.preventDefault(); // Always prevent default form submission
+        e.preventDefault();
 
-        hideMessages(); // Hide any previous messages
+        hideMessages();
 
         if (!validateForm()) {
             showError('Please fix the validation errors before submitting.');
             return false;
         }
 
-        // Create FormData object
+        // Create FormData object for file upload
         const formData = new FormData(form);
 
         // Submit via AJAX
@@ -361,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
             field.classList.remove('is-valid', 'is-invalid');
         });
         passwordStrengthDiv.innerHTML = '';
+        imagePreview.style.display = 'none';
         hideMessages();
     });
 });

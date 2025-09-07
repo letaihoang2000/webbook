@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.webbook.model.User;
+import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,9 @@ public class UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private ImageUploadService imageUploadService;
 
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
@@ -64,6 +69,19 @@ public class UserService {
             // Generate username from first name and last name
             String username = addUserForm.getFirst_name() + addUserForm.getLast_name();
             user.setUsername(username);
+
+            // Handle image upload
+            MultipartFile imageFile = addUserForm.getImageFile();
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    String imageUrl = imageUploadService.uploadImage(imageFile,user.getId());
+                    user.setImage(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid image file: " + e.getMessage());
+                }
+            }
 
             // Set other fields
             user.setEmail(addUserForm.getEmail());
