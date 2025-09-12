@@ -1,6 +1,7 @@
 package com.example.webbook.service;
 
 import com.example.webbook.dto.AddUserForm;
+import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.dto.UserInfo;
 import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.Role;
@@ -44,6 +45,7 @@ public class UserService {
 
     private UserInfo convertToUserInfo(User user) {
         UserInfo userInfo = modelMapper.map(user, UserInfo.class);
+        userInfo.setUser_id(user.getId().toString());
         // Map role name specifically since it's nested
         if (user.getRole() != null) {
             userInfo.setRole_name(user.getRole().getRoleName());
@@ -66,10 +68,6 @@ public class UserService {
             User user = new User();
             user.setId(UUID.randomUUID());
 
-            // Generate username from first name and last name
-            String username = addUserForm.getFirst_name() + addUserForm.getLast_name();
-            user.setUsername(username);
-
             // Handle image upload
             MultipartFile imageFile = addUserForm.getImageFile();
             if (imageFile != null && !imageFile.isEmpty()) {
@@ -83,7 +81,8 @@ public class UserService {
                 }
             }
 
-            // Set other fields
+            user.setFirst_name(addUserForm.getFirst_name());
+            user.setLast_name(addUserForm.getLast_name());
             user.setEmail(addUserForm.getEmail());
             user.setMobile(addUserForm.getMobile());
             user.setAddress(addUserForm.getAddress());
@@ -99,6 +98,55 @@ public class UserService {
             return userRepository.save(user);
         } catch(Exception e){
             throw new RuntimeException("Failed to add user: " + e.getMessage());
+        }
+    }
+
+    // Update user
+    public User updateUser(UpdateUserForm updateUserForm) {
+        try {
+            UUID userId = UUID.fromString(updateUserForm.getId());
+            User existingUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Update username if name fields changed
+            existingUser.setFirst_name(updateUserForm.getFirst_name());
+            existingUser.setLast_name(updateUserForm.getLast_name());
+
+            // Update fields (email remains unchanged)
+            existingUser.setMobile(updateUserForm.getMobile());
+            existingUser.setAddress(updateUserForm.getAddress());
+
+            // Update password only if provided
+            if (updateUserForm.getPassword() != null && !updateUserForm.getPassword().trim().isEmpty()) {
+//                existingUser.setPassword(passwordEncoder.encode(updateUserForm.getPassword()));
+                existingUser.setPassword(updateUserForm.getPassword());
+            }
+
+            // Handle image upload if provided
+            MultipartFile imageFile = updateUserForm.getImageFile();
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    // Delete old image if exists
+                    if (existingUser.getImage() != null && !existingUser.getImage().isEmpty()) {
+                        imageUploadService.deleteImage(existingUser.getImage());
+                    }
+
+                    // Upload new image
+                    String imageUrl = imageUploadService.uploadImage(imageFile, existingUser.getId());
+                    existingUser.setImage(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid image file: " + e.getMessage());
+                }
+            }
+
+            // Update timestamp
+            existingUser.setLast_updated(LocalDateTime.now());
+
+            return userRepository.save(existingUser);
+        } catch(Exception e){
+            throw new RuntimeException("Failed to update user: " + e.getMessage());
         }
     }
 }

@@ -40,9 +40,10 @@ public class ImageUploadService {
         }
 
         try {
-            // Upload to Cloudinary with correct folder path using public_id
+            // Method 2: Using separate folder parameter (Cloudinary recommended)
             Map<String, Object> uploadOptions = ObjectUtils.asMap(
-                    "public_id", "Home/webbook/user_avatars/" + imageId,
+                    "folder", "webbook/user_avatars",           // Destination folder
+                    "public_id", imageId.toString(),            // Just the filename/ID
                     "resource_type", "image",
                     "transformation", new Transformation()
                             .width(300).height(300)
@@ -55,7 +56,6 @@ public class ImageUploadService {
 
             // Debug logging
             System.out.println("Public ID: " + uploadResult.get("public_id"));
-            System.out.println("Folder: " + uploadResult.get("folder"));
             System.out.println("URL: " + uploadResult.get("secure_url"));
 
             // Return the secure URL
@@ -77,7 +77,9 @@ public class ImageUploadService {
             if (imageUrl != null && imageUrl.contains("cloudinary.com")) {
                 // Extract public ID from URL
                 String publicId = extractPublicIdFromUrl(imageUrl);
-                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                if (publicId != null) {
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                }
             }
         } catch (IOException e) {
             // Log error but don't throw - deletion failure shouldn't break user operations
@@ -87,9 +89,23 @@ public class ImageUploadService {
 
     private String extractPublicIdFromUrl(String url) {
         // Extract public ID from Cloudinary URL
-        // Example: https://res.cloudinary.com/demo/image/upload/v1234567890/Home/webbook/user_avatars/sample.jpg
-        String[] parts = url.split("/");
-        String filename = parts[parts.length - 1];
-        return "Home/webbook/user_avatars/" + filename.substring(0, filename.lastIndexOf('.'));
+        // Example: https://res.cloudinary.com/demo/image/upload/v1234567890/webbook/user_avatars/uuid.jpg
+        // The public_id for Method 2 is: "webbook/user_avatars/uuid"
+        try {
+            String[] parts = url.split("/upload/");
+            if (parts.length > 1) {
+                String pathWithVersion = parts[1];
+                // Remove version number (v1234567890/)
+                String pathWithoutVersion = pathWithVersion.replaceFirst("v\\d+/", "");
+                // Remove file extension
+                int lastDotIndex = pathWithoutVersion.lastIndexOf('.');
+                if (lastDotIndex > 0) {
+                    return pathWithoutVersion.substring(0, lastDotIndex);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error extracting public ID from URL: " + url + " - " + e.getMessage());
+        }
+        return null;
     }
 }

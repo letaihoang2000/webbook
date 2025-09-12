@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     $('#addUserForm').modal('hide');
                     window.location.reload();
-                }, 2000);
+                }, 3000);
             } else {
                 showError(data.message);
             }

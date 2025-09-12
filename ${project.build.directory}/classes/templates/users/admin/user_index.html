@@ -56,7 +56,8 @@
                             <thead class="table-light">
                             <tr>
                                 <th>Avatar</th>
-                                <th>Username</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
                                 <th>Email</th>
                                 <th>Mobile</th>
                                 <th>Role</th>
@@ -72,7 +73,10 @@
                                     >
                                 </td>
                                 <td>
-                                    <strong th:text="${user.username}"></strong>
+                                    <strong th:text="${user.first_name}"></strong>
+                                </td>
+                                <td>
+                                    <strong th:text="${user.last_name}"></strong>
                                 </td>
                                 <td>
                                     <span th:text="${user.email}"></span>
@@ -89,23 +93,30 @@
                                 </td>
                                 <td class="text-center table-actions">
                                     <div class="btn-group" role="group">
-                                        <a th:href="@{http://localhost:8080/users/{username}(username=${user.username})}"
+                                        <a
                                            class="btn btn-outline-info btn-sm"
                                            title="Xem chi tiết">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button type="button"
-                                                class="btn btn-outline-warning btn-sm"
+                                                class="btn btn-outline-warning btn-sm edit-user-btn"
                                                 data-toggle="modal"
                                                 data-target="#updateUserForm"
-                                                title="Chỉnh sửa">
+                                                title="Chỉnh sửa"
+                                                th:attr="data-user-id=${user.user_id},
+                                                         data-firstName=${user.first_name},
+                                                         data-lastName=${user.last_name},
+                                                         data-email=${user.email},
+                                                         data-mobile=${user.mobile ?: ''},
+                                                         data-address=${user.address ?: ''},
+                                                         data-image=${user.image ?: ''}">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button type="button"
                                                 class="btn btn-outline-danger btn-sm"
-                                                title="Xóa"
-                                                onclick="confirmDelete(this)"
-                                                th:data-username="${user.username}">
+                                                title="Xóa">
+<!--                                                onclick="confirmDelete(this)"-->
+<!--                                                th:data-username="${user.username}"-->
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -154,5 +165,8 @@
 <script th:src="@{/js/popper.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/main.js}"></script>
+
+<script th:src="@{/js/add_user_form.js}"></script>
+<script th:src="@{/js/update_user_form.js}"></script>
 </body>
 </html>

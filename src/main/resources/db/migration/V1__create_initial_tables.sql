@@ -9,7 +9,8 @@ CREATE TABLE roles (
 -- Tạo bảng users
 CREATE TABLE users (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    username VARCHAR(255),
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
     image LONGTEXT,
     email VARCHAR(255),
     password VARCHAR(255),

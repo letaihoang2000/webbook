@@ -1,6 +1,7 @@
 package com.example.webbook.controller;
 
 import com.example.webbook.dto.AddUserForm;
+import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.dto.UserInfo;
 import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.User;
@@ -56,6 +57,27 @@ public class UserController {
             response.put("success", false);
             response.put("errorType", "general");
             response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while creating the user.");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    // Update user
+    @PostMapping("/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateUser(@ModelAttribute UpdateUserForm updateUserForm) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            User updatedUser = userService.updateUser(updateUserForm);
+            response.put("success", true);
+            response.put("message", "User updated successfully!");
+            response.put("userId", updatedUser.getId().toString());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("errorType", "general");
+            response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while updating the user.");
             return ResponseEntity.status(500).body(response);
         }
     }
