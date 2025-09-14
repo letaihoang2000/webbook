@@ -7,6 +7,7 @@ import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.User;
 import com.example.webbook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,6 +80,29 @@ public class UserController {
             response.put("errorType", "general");
             response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while updating the user.");
             return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String userId) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            userService.deleteUser(userId);
+            response.put("success", true);
+            response.put("message", "User deleted successfully!");
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "An unexpected error occurred while deleting the user.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

@@ -9,6 +9,15 @@ public class UserInfo {
     private String mobile;
     private String address;
     private String role_name;
+    private String last_updated;
+
+    public String getLast_updated() {
+        return last_updated;
+    }
+
+    public void setLast_updated(String last_updated) {
+        this.last_updated = last_updated;
+    }
 
     public String getUser_id() {
         return user_id;

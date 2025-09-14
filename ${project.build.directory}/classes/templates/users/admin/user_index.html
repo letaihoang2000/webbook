@@ -6,7 +6,6 @@
     <title>Quản lý Users</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/static/css/admin_add_user.css}">
     <style>
         .user-avatar {
             width: 40px;
@@ -35,17 +34,17 @@
     <div id="content" class="p-4 p-md-5">
         <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
 
-        <h2 class="mb-4">Admin Dashboard</h2>
+        <h2 class="mb-4">Users</h2>
         <div class="container mt-4">
             <div class="card shadow">
                 <div class="card-header text-white">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h4 class="mb-0"><i class="fas fa-users me-2"></i>Danh sách Users</h4>
+                            <h4 class="mb-0"><i class="fas fa-users me-2"></i>View Users</h4>
                         </div>
                         <div class="col-auto mb-3">
                             <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addUserForm">
-                                <i class="fas fa-plus me-1"></i> Thêm User
+                                <i class="fas fa-plus me-1"></i> Create User
                             </button>
                         </div>
                     </div>
@@ -85,7 +84,10 @@
                                     <span th:text="${user.mobile ?: 'N/A'}"></span>
                                 </td>
                                 <td>
-                                    <span th:if="${user.role_name != null and !#strings.isEmpty(user.role_name)}"
+                                    <span th:if="${user.role_name == 'MANAGER'}"
+                                          class="badge bg-danger badge-role"
+                                          th:text="${user.role_name}"></span>
+                                    <span th:if="${user.role_name != null and !#strings.isEmpty(user.role_name) and user.role_name != 'MANAGER'}"
                                           class="badge bg-primary badge-role"
                                           th:text="${user.role_name}"></span>
                                     <span th:if="${user.role_name == null or #strings.isEmpty(user.role_name)}"
@@ -94,8 +96,17 @@
                                 <td class="text-center table-actions">
                                     <div class="btn-group" role="group">
                                         <a
-                                           class="btn btn-outline-info btn-sm"
-                                           title="Xem chi tiết">
+                                                class="btn btn-outline-info btn-sm view-user-btn"
+                                                title="View Details"
+                                                th:attr="data-user-id=${user.user_id},
+                                                    data-first-name=${user.first_name},
+                                                    data-last-name=${user.last_name},
+                                                    data-email=${user.email},
+                                                    data-mobile=${user.mobile ?: ''},
+                                                    data-address=${user.address ?: ''},
+                                                    data-image=${user.image ?: ''},
+                                                    data-role=${user.role_name ?: ''},
+                                                    data-last-updated=${user.last_updated ?: ''}">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button type="button"
@@ -113,10 +124,11 @@
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button type="button"
-                                                class="btn btn-outline-danger btn-sm"
-                                                title="Xóa">
-<!--                                                onclick="confirmDelete(this)"-->
-<!--                                                th:data-username="${user.username}"-->
+                                                class="btn btn-outline-danger btn-sm delete-user-btn"
+                                                title="Xóa"
+                                                th:attr="data-user-id=${user.user_id},
+                                                         data-user-name=${user.first_name + ' ' + user.last_name},
+                                                         data-user-email=${user.email}">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -158,15 +170,19 @@
     </div>
 </div>
 
+<div th:replace="~{modals/admin_view_user :: viewUserModal}"></div>
 <div th:replace="~{modals/admin_add_user :: addUserModal}"></div>
 <div th:replace="~{modals/admin_update_user :: updateUserModal}"></div>
+<div th:replace="~{modals/admin_delete_user :: deleteUserModal}"></div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
 <script th:src="@{/js/popper.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/main.js}"></script>
 
+<script th:src="@{/js/view_user_form.js}"></script>
 <script th:src="@{/js/add_user_form.js}"></script>
 <script th:src="@{/js/update_user_form.js}"></script>
+<script th:src="@{/js/delete_user_form.js}"></script>
 </body>
 </html>

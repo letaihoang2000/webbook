@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,6 +47,13 @@ public class UserService {
     private UserInfo convertToUserInfo(User user) {
         UserInfo userInfo = modelMapper.map(user, UserInfo.class);
         userInfo.setUser_id(user.getId().toString());
+
+        // Format last_updated date to string
+        if (user.getLast_updated() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+            userInfo.setLast_updated(user.getLast_updated().format(formatter));
+        }
+
         // Map role name specifically since it's nested
         if (user.getRole() != null) {
             userInfo.setRole_name(user.getRole().getRoleName());
@@ -147,6 +155,32 @@ public class UserService {
             return userRepository.save(existingUser);
         } catch(Exception e){
             throw new RuntimeException("Failed to update user: " + e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            UUID userUuid = UUID.fromString(userId);
+            User user = userRepository.findById(userUuid)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Delete user's image from Cloudinary if exists
+            if (user.getImage() != null && !user.getImage().trim().isEmpty()) {
+                try {
+                    imageUploadService.deleteImage(user.getImage());
+                } catch (Exception e) {
+                    // Log the error but don't fail the user deletion
+                    System.err.println("Warning: Failed to delete image for user " + userId + ": " + e.getMessage());
+                }
+            }
+
+            // Delete user from database
+            userRepository.delete(user);
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid user ID format: " + userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete user: " + e.getMessage());
         }
     }
 }
