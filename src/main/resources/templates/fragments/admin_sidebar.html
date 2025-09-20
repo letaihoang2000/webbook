@@ -2,25 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-</head>
 <body>
 <nav id="sidebar" class="active" th:fragment="sidebar">
     <h1><a th:href="@{/}" class="logo">M.</a></h1>
     <ul class="list-unstyled components mb-5">
         <li>
-            <a th:href="@{/users/home}"><span class="fa fa-home"></span> Dashboard</a>
+            <a th:href="@{#}"><span class="fa-solid fa-chart-line"></span>Dashboard</a>
         </li>
         <li>
-            <a th:href="@{/users}"><span class="fa fa-user"></span> Users</a>
+            <a th:href="@{/user/users}"><span class="fa-solid fa-users"></span>Users</a>
         </li>
         <li>
-            <a th:href="@{#}"><span class="fa fa-sticky-note"></span> Books</a>
+            <a th:href="@{#}"><span class="fa-solid fa-icons"></span>Categories</a>
         </li>
         <li>
-            <a th:href="@{#}"><span class="fa fa-cogs"></span> Services</a>
+            <a th:href="@{#}"><span class="fa-solid fa-user-pen"></span>Authors</a>
         </li>
         <li>
-            <a th:href="@{#}"><span class="fa fa-paper-plane"></span> Contacts</a>
+            <a th:href="@{#}"><span class="fa-solid fa-book"></span>Books</a>
         </li>
     </ul>
     <div class="footer">

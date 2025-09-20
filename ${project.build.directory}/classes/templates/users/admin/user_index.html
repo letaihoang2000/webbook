@@ -55,8 +55,7 @@
                             <thead class="table-light">
                             <tr>
                                 <th>Avatar</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
+                                <th>Username</th>
                                 <th>Email</th>
                                 <th>Mobile</th>
                                 <th>Role</th>
@@ -72,10 +71,7 @@
                                     >
                                 </td>
                                 <td>
-                                    <strong th:text="${user.first_name}"></strong>
-                                </td>
-                                <td>
-                                    <strong th:text="${user.last_name}"></strong>
+                                    <strong th:text="${user.first_name + ' ' + user.last_name}"></strong>
                                 </td>
                                 <td>
                                     <span th:text="${user.email}"></span>
@@ -84,10 +80,7 @@
                                     <span th:text="${user.mobile ?: 'N/A'}"></span>
                                 </td>
                                 <td>
-                                    <span th:if="${user.role_name == 'MANAGER'}"
-                                          class="badge bg-danger badge-role"
-                                          th:text="${user.role_name}"></span>
-                                    <span th:if="${user.role_name != null and !#strings.isEmpty(user.role_name) and user.role_name != 'MANAGER'}"
+                                    <span th:if="${user.role_name != null and !#strings.isEmpty(user.role_name)}"
                                           class="badge bg-primary badge-role"
                                           th:text="${user.role_name}"></span>
                                     <span th:if="${user.role_name == null or #strings.isEmpty(user.role_name)}"
@@ -138,29 +131,29 @@
                         </table>
                     </div>
 
-                    <!-- Empty state khi không có users -->
+                    <!-- Empty state when there is currently no user -->
                     <div th:if="${#lists.isEmpty(users)}" class="text-center py-5">
                         <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">Chưa có users nào</h5>
-                        <p class="text-muted">Bấm nút "Thêm User" để tạo user đầu tiên</p>
+                        <h5 class="text-muted">There is currently no user</h5>
+                        <p class="text-muted">Click "Create User" to add a new user</p>
                         <a href="http://localhost:8080/users/add" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>Thêm User
                         </a>
                     </div>
                 </div>
 
-                <!-- Footer với thông tin tổng quan -->
+                <!-- Footer with overall info -->
                 <div class="card-footer bg-light" th:if="${!#lists.isEmpty(users)}">
                     <div class="row align-items-center">
                         <div class="col">
                             <small class="text-muted">
-                                Tổng cộng: <strong th:text="${#lists.size(users)}">0</strong> users
+                                Total: <strong th:text="${#lists.size(users)}">0</strong> users
                             </small>
                         </div>
                         <div class="col-auto">
                             <small class="text-muted">
-                                <i class="fas fa-clock me-1"></i>Cập nhật lần cuối:
-                                <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}"></span>
+                                <i class="fas fa-clock me-1"></i>Last updated:
+                                <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy hh:mm a')}"></span>
                             </small>
                         </div>
                     </div>

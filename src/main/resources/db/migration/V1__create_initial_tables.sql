@@ -1,12 +1,10 @@
--- V1__Create_initial_tables.sql
-
--- Tạo bảng roles
+-- Create table roles
 CREATE TABLE roles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(255) UNIQUE NOT NULL
 );
 
--- Tạo bảng users
+-- Create table users
 CREATE TABLE users (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     first_name VARCHAR(255),
@@ -22,20 +20,20 @@ CREATE TABLE users (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
--- Tạo bảng categories
+-- Create table categories
 CREATE TABLE categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255)
 );
 
--- Tạo bảng authors
+-- Create table authors
 CREATE TABLE authors (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     name VARCHAR(255),
     description LONGTEXT
 );
 
--- Tạo bảng books
+-- Create table books
 CREATE TABLE books (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     title VARCHAR(255),

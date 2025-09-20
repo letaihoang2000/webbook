@@ -107,9 +107,7 @@ function populateAndShowModal(userData) {
     // Set role badge color
     const roleBadge = document.getElementById('viewUserRoleBadge');
     roleBadge.className = 'badge role-badge';
-    if (role === 'MANAGER') {
-        roleBadge.classList.add('bg-danger');
-    } else if (role === 'USER') {
+    if (role === 'USER') {
         roleBadge.classList.add('bg-primary');
     } else {
         roleBadge.classList.add('bg-secondary');
