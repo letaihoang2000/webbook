@@ -9,6 +9,7 @@ import com.example.webbook.repository.RoleRepository;
 import com.example.webbook.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.webbook.model.User;
 import java.io.IOException;
@@ -34,8 +35,8 @@ public class UserService {
     @Autowired
     private ImageUploadService imageUploadService;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<UserInfo> getAllUsersInfo() {
         List<User> users = userRepository.findUsersExcludingAdmin();
@@ -94,7 +95,7 @@ public class UserService {
             user.setEmail(addUserForm.getEmail());
             user.setMobile(addUserForm.getMobile());
             user.setAddress(addUserForm.getAddress());
-//        user.setPassword(passwordEncoder.encode(addUserForm.getPassword()));
+        user.setPassword(passwordEncoder.encode(addUserForm.getPassword()));
             user.setPassword(addUserForm.getPassword());
 
             user.setRole(userRole);

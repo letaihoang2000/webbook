@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <title>Login</title>
+</head>
+<body>
+<div class="overlay">
+    <form action="/perform_login" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="con">
+            <header class="head-form">
+                <h2>Log In</h2>
+                <p>Login here using your email and password</p>
+            </header>
+
+            <!-- Error Messages -->
+            <div th:if="${param.error}" class="alert alert-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                <span>Invalid email or password. Please try again.</span>
+            </div>
+
+            <!-- Success Messages -->
+            <div th:if="${param.logout}" class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                <span>You have been logged out successfully.</span>
+            </div>
+
+            <br>
+            <div class="field-set">
+                <span class="input-item">
+                    <i class="fa fa-user-circle"></i>
+                </span>
+                <input class="form-input"
+                       id="txt-input"
+                       type="email"
+                       name="email"
+                       placeholder="Email"
+                       required>
+                <br>
+
+                <span class="input-item">
+                    <i class="fa fa-key"></i>
+                </span>
+                <input class="form-input"
+                       type="password"
+                       placeholder="Password"
+                       id="pwd"
+                       name="password"
+                       required>
+                <i class="fa fa-eye" id="eye"></i>
+                <br>
+
+                <button type="submit" class="log-in">Log In</button>
+            </div>
+
+            <div class="other">
+                <button type="button" class="btn submits frgt-pass">Forgot Password</button>
+                <button type="button" class="btn submits sign-up">Sign Up
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>
