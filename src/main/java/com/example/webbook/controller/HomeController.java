@@ -24,7 +24,7 @@ public class HomeController {
             String roleName = userDetails.getRoleName();
 
             if ("ADMIN".equals(roleName)) {
-                return "redirect:/user/home";
+                return "redirect:/user/dashboard";
             } else if ("USER".equals(roleName)) {
                 return "redirect:/customer/home";
             }
@@ -47,7 +47,7 @@ public class HomeController {
             String roleName = userDetails.getRoleName();
 
             if ("ADMIN".equals(roleName)) {
-                return "redirect:/user/home";
+                return "redirect:/user/dashboard";
             } else if ("USER".equals(roleName)) {
                 return "redirect:/customer/home";
             }

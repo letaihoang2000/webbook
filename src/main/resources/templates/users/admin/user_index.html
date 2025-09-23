@@ -106,7 +106,7 @@
                                                 class="btn btn-outline-warning btn-sm edit-user-btn"
                                                 data-toggle="modal"
                                                 data-target="#updateUserForm"
-                                                title="Chỉnh sửa"
+                                                title="Edit"
                                                 th:attr="data-user-id=${user.user_id},
                                                          data-firstName=${user.first_name},
                                                          data-lastName=${user.last_name},
@@ -118,7 +118,7 @@
                                         </button>
                                         <button type="button"
                                                 class="btn btn-outline-danger btn-sm delete-user-btn"
-                                                title="Xóa"
+                                                title="Delete"
                                                 th:attr="data-user-id=${user.user_id},
                                                          data-user-name=${user.first_name + ' ' + user.last_name},
                                                          data-user-email=${user.email}">
@@ -163,15 +163,17 @@
     </div>
 </div>
 
-<div th:replace="~{modals/admin_view_user :: viewUserModal}"></div>
-<div th:replace="~{modals/admin_add_user :: addUserModal}"></div>
-<div th:replace="~{modals/admin_update_user :: updateUserModal}"></div>
-<div th:replace="~{modals/admin_delete_user :: deleteUserModal}"></div>
+<div th:replace="~{modals/admin/view_user :: viewUserModal}"></div>
+<div th:replace="~{modals/admin/add_user :: addUserModal}"></div>
+<div th:replace="~{modals/admin/update_user :: updateUserModal}"></div>
+<div th:replace="~{modals/admin/delete_user :: deleteUserModal}"></div>
+<div th:replace="~{modals/admin/logout :: logoutModal}"></div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
 <script th:src="@{/js/popper.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/logout.js}"></script>
 
 <script th:src="@{/js/view_user_form.js}"></script>
 <script th:src="@{/js/add_user_form.js}"></script>

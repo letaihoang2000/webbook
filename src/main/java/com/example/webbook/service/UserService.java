@@ -95,7 +95,7 @@ public class UserService {
             user.setEmail(addUserForm.getEmail());
             user.setMobile(addUserForm.getMobile());
             user.setAddress(addUserForm.getAddress());
-        user.setPassword(passwordEncoder.encode(addUserForm.getPassword()));
+            user.setPassword(passwordEncoder.encode(addUserForm.getPassword()));
             user.setPassword(addUserForm.getPassword());
 
             user.setRole(userRole);
@@ -127,8 +127,7 @@ public class UserService {
 
             // Update password only if provided
             if (updateUserForm.getPassword() != null && !updateUserForm.getPassword().trim().isEmpty()) {
-//                existingUser.setPassword(passwordEncoder.encode(updateUserForm.getPassword()));
-                existingUser.setPassword(updateUserForm.getPassword());
+                existingUser.setPassword(passwordEncoder.encode(updateUserForm.getPassword()));
             }
 
             // Handle image upload if provided

@@ -23,9 +23,9 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/home")
-    public String adminIndex(){
-        return "users/admin/home";
+    @GetMapping("/dashboard")
+    public String dashboardView(){
+        return "users/admin/dashboard";
     }
 
     @GetMapping("/users")

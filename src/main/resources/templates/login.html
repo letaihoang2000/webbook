@@ -54,6 +54,17 @@
                 <i class="fa fa-eye" id="eye"></i>
                 <br>
 
+                <!-- Remember Me checkbox -->
+                <div class="remember-me-container" style="margin: 15px 0; text-align: left;">
+                    <label class="remember-me-label" style="display: flex; align-items: center; color: #333; font-size: 14px; cursor: pointer;">
+                        <input type="checkbox"
+                               name="remember-me"
+                               id="remember-me"
+                               style="margin-right: 8px; transform: scale(1.1);">
+                        <span>Remember me</span>
+                    </label>
+                </div>
+
                 <button type="submit" class="log-in">Log In</button>
             </div>
 
@@ -67,5 +78,6 @@
     </form>
 </div>
 <script th:src="@{/js/login.js}"></script>
+<script th:src="@{/js/logout.js}"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -40,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/").permitAll()
 
                         // Admin only access
-                        .requestMatchers("/user/users", "/user/add", "/user/update", "/user/delete/**", "/user/home").hasRole("ADMIN")
+                        .requestMatchers("/user/users", "/user/add", "/user/update", "/user/delete/**", "/user/dashboard").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // Customer access (both USER and ADMIN can access customer pages)
@@ -58,16 +59,28 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+                .rememberMe(remember -> remember
+                        .key("mySecretKey") // Change this to a secure random key in production
+                        .tokenValiditySeconds(86400) // 24 hours = 86400 seconds
+                        .userDetailsService(customUserDetailsService)
+                        .rememberMeParameter("remember-me") // Name of the checkbox parameter
+                        .rememberMeCookieName("remember-me-cookie")
+                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "remember-me-cookie") // Also delete remember-me cookie on logout
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1) // Allow only one session per user
+                        .maxSessionsPreventsLogin(false) // Allow new login to invalidate old session
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/user/add", "/user/update", "/user/delete/**")
+                        .ignoringRequestMatchers("/user/add", "/user/update", "/user/delete/**", "/logout")
                 );
 
         return http.build();
