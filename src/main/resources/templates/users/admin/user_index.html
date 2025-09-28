@@ -6,23 +6,7 @@
     <title>Quản lý Users</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .table-actions {
-            white-space: nowrap;
-        }
-        .badge-role {
-            font-size: 0.8em;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/user_index.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="bg-light">
@@ -42,7 +26,17 @@
                         <div class="col">
                             <h4 class="mb-0"><i class="fas fa-users me-2"></i>View Users</h4>
                         </div>
-                        <div class="col-auto mb-3">
+                        <div class="col-md-4">
+                            <div class="search-container">
+                                <input type="text"
+                                       id="userSearch"
+                                       class="form-control search-input"
+                                       placeholder="Search by name or email..."
+                                       th:value="${searchQuery}">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-auto">
                             <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addUserForm">
                                 <i class="fas fa-plus me-1"></i> Create User
                             </button>
@@ -50,6 +44,18 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
+                    <!-- Pagination Info -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom" th:if="${!#lists.isEmpty(users)}">
+                        <div class="pagination-info">
+                            Showing <strong th:text="${currentPage * pageSize + 1}">1</strong> to
+                            <strong th:text="${#numbers.formatInteger((currentPage * pageSize + #lists.size(users)), 0)}">10</strong>
+                            of <strong th:text="${totalUsers}">50</strong> users
+                        </div>
+                        <div class="pagination-info">
+                            Page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">5</strong>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
@@ -136,18 +142,82 @@
                         <i class="fas fa-users fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">There is currently no user</h5>
                         <p class="text-muted">Click "Create User" to add a new user</p>
-                        <a href="http://localhost:8080/users/add" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i>Thêm User
-                        </a>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserForm">
+                            <i class="fas fa-plus me-1"></i>Add User
+                        </button>
                     </div>
                 </div>
 
+                <!-- Pagination Navigation -->
+                <div class="card-footer bg-light" th:if="${totalPages > 1}">
+                    <nav aria-label="User pagination navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <!-- Previous button -->
+                            <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/user/users(page=${currentPage - 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:if="${hasPrevious}"
+                                   aria-label="Previous">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                                <span class="page-link" th:unless="${hasPrevious}" aria-label="Previous">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </span>
+                            </li>
+
+                            <!-- First page -->
+                            <li class="page-item" th:if="${startPage > 0}">
+                                <a class="page-link" th:href="@{/user/users(page=0, size=${pageSize}, search=${searchQuery})}">1</a>
+                            </li>
+
+                            <!-- Ellipsis -->
+                            <li class="page-item disabled" th:if="${startPage > 1}">
+                                <span class="page-link">...</span>
+                            </li>
+
+                            <!-- Page numbers -->
+                            <li class="page-item"
+                                th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/user/users(page=${pageNum}, size=${pageSize}, search=${searchQuery})}"
+                                   th:text="${pageNum + 1}">1</a>
+                            </li>
+
+                            <!-- Ellipsis -->
+                            <li class="page-item disabled" th:if="${endPage < totalPages - 2}">
+                                <span class="page-link">...</span>
+                            </li>
+
+                            <!-- Last page -->
+                            <li class="page-item" th:if="${endPage < totalPages - 1}">
+                                <a class="page-link"
+                                   th:href="@{/user/users(page=${totalPages - 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:text="${totalPages}">Last</a>
+                            </li>
+
+                            <!-- Next button -->
+                            <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/user/users(page=${currentPage + 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:if="${hasNext}"
+                                   aria-label="Next">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <span class="page-link" th:unless="${hasNext}" aria-label="Next">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
                 <!-- Footer with overall info -->
-                <div class="card-footer bg-light" th:if="${!#lists.isEmpty(users)}">
+                <div class="card-footer bg-light" th:if="${!#lists.isEmpty(users) && totalPages <= 1}">
                     <div class="row align-items-center">
                         <div class="col">
                             <small class="text-muted">
-                                Total: <strong th:text="${#lists.size(users)}">0</strong> users
+                                Total: <strong th:text="${totalUsers}">0</strong> users
                             </small>
                         </div>
                         <div class="col-auto">
@@ -176,8 +246,10 @@
 <script th:src="@{/js/logout.js}"></script>
 
 <script th:src="@{/js/view_user_form.js}"></script>
+<script th:src="@{/js/search_user.js}"></script>
 <script th:src="@{/js/add_user_form.js}"></script>
 <script th:src="@{/js/update_user_form.js}"></script>
 <script th:src="@{/js/delete_user_form.js}"></script>
+
 </body>
 </html>

@@ -9,6 +9,11 @@ import com.example.webbook.repository.RoleRepository;
 import com.example.webbook.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.webbook.model.User;
@@ -17,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -43,6 +50,52 @@ public class UserService {
         return users.stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
+    }
+
+    // Paginated method with search support
+    public Page<UserInfo> getUsersInfoPaginated(int page, int size, String searchQuery) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<User> userPage;
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            userPage = userRepository.findUsersExcludingAdminWithSearch(searchQuery.trim(), pageable);
+        } else {
+            userPage = userRepository.findUsersExcludingAdmin(pageable);
+        }
+
+        return userPage.map(this::convertToUserInfo);
+    }
+
+    public Page<UserInfo> getUsersInfoPaginated(int page, int size) {
+        return getUsersInfoPaginated(page, size, null);
+    }
+
+    // Get pagination info with search support
+    public Map<String, Object> getPaginationInfo(int currentPage, int pageSize, String searchQuery) {
+        long totalUsers;
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            totalUsers = userRepository.countUsersExcludingAdminWithSearch(searchQuery.trim());
+        } else {
+            totalUsers = userRepository.countUsersExcludingAdmin();
+        }
+
+        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+        Map<String, Object> paginationInfo = new HashMap<>();
+        paginationInfo.put("currentPage", currentPage);
+        paginationInfo.put("pageSize", pageSize);
+        paginationInfo.put("totalUsers", totalUsers);
+        paginationInfo.put("totalPages", totalPages);
+        paginationInfo.put("hasPrevious", currentPage > 0);
+        paginationInfo.put("hasNext", currentPage < totalPages - 1);
+        paginationInfo.put("searchQuery", searchQuery);
+
+        return paginationInfo;
+    }
+
+    public Map<String, Object> getPaginationInfo(int currentPage, int pageSize) {
+        return getPaginationInfo(currentPage, pageSize, null);
     }
 
     private UserInfo convertToUserInfo(User user) {

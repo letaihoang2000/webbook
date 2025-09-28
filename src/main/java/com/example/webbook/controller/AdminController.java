@@ -7,6 +7,7 @@ import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.User;
 import com.example.webbook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,13 +29,38 @@ public class AdminController {
         return "users/admin/dashboard";
     }
 
+    // Get all users, except Admin
     @GetMapping("/users")
-    public String listUsers(Model model) {
-        List<UserInfo> usersInfo = userService.getAllUsersInfo();
-        model.addAttribute("users", usersInfo);
+    public String listUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            Model model) {
+
+        // Get paginated users with search
+        Page<UserInfo> userPage = userService.getUsersInfoPaginated(page, size, search);
+        Map<String, Object> paginationInfo = userService.getPaginationInfo(page, size, search);
+
+        // Add to model
+        model.addAttribute("users", userPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("totalUsers", userPage.getTotalElements());
+        model.addAttribute("pageSize", size);
+        model.addAttribute("hasPrevious", userPage.hasPrevious());
+        model.addAttribute("hasNext", userPage.hasNext());
+        model.addAttribute("searchQuery", search != null ? search : "");
+
+        // Generate page numbers for pagination nav
+        int startPage = Math.max(0, page - 2);
+        int endPage = Math.min(userPage.getTotalPages() - 1, page + 2);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "users/admin/user_index";
     }
 
+    // Add user
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> createUser(@ModelAttribute AddUserForm addUserForm) {
@@ -83,6 +109,7 @@ public class AdminController {
         }
     }
 
+    // Delete user
     @DeleteMapping("/delete/{userId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String userId) {
