@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .modal-logout .modal-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .modal-logout .modal-header .close {
+            color: white;
+            opacity: 0.8;
+        }
+
+        .modal-logout .modal-header .close:hover {
+            opacity: 1;
+        }
+
+        .modal-logout .logout-icon {
+            font-size: 3rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .modal-logout .modal-body {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .modal-logout .logout-message {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-logout .logout-submessage {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Logout Confirmation Modal -->
+<div th:fragment="logoutModal" id="logoutModal" class="modal fade modal-logout" tabindex="-1"
+     aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="logoutModalLabel">
+                    <i class="fa fa-sign-out me-2"></i>Confirm Logout
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="logout-message">
+                    Are you sure you want to sign out?
+                </div>
+                <div class="logout-submessage">
+                    You will need to log in again to access customer page.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">
+                    <i class="fa fa-sign-out me-1"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden logout form -->
+<form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">
+    <!-- CSRF token will be automatically included by Thymeleaf -->
+</form>
+
+</body>
+</html>

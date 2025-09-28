@@ -155,7 +155,7 @@
                             <!-- Previous button -->
                             <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="@{/user/users(page=${currentPage - 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:href="@{/admin/users(page=${currentPage - 1}, size=${pageSize}, search=${searchQuery})}"
                                    th:if="${hasPrevious}"
                                    aria-label="Previous">
                                     <i class="fas fa-chevron-left"></i> Previous
@@ -167,7 +167,7 @@
 
                             <!-- First page -->
                             <li class="page-item" th:if="${startPage > 0}">
-                                <a class="page-link" th:href="@{/user/users(page=0, size=${pageSize}, search=${searchQuery})}">1</a>
+                                <a class="page-link" th:href="@{/admin/users(page=0, size=${pageSize}, search=${searchQuery})}">1</a>
                             </li>
 
                             <!-- Ellipsis -->
@@ -180,7 +180,7 @@
                                 th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                                 th:classappend="${pageNum == currentPage} ? 'active'">
                                 <a class="page-link"
-                                   th:href="@{/user/users(page=${pageNum}, size=${pageSize}, search=${searchQuery})}"
+                                   th:href="@{/admin/users(page=${pageNum}, size=${pageSize}, search=${searchQuery})}"
                                    th:text="${pageNum + 1}">1</a>
                             </li>
 
@@ -192,14 +192,14 @@
                             <!-- Last page -->
                             <li class="page-item" th:if="${endPage < totalPages - 1}">
                                 <a class="page-link"
-                                   th:href="@{/user/users(page=${totalPages - 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:href="@{/admin/users(page=${totalPages - 1}, size=${pageSize}, search=${searchQuery})}"
                                    th:text="${totalPages}">Last</a>
                             </li>
 
                             <!-- Next button -->
                             <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="@{/user/users(page=${currentPage + 1}, size=${pageSize}, search=${searchQuery})}"
+                                   th:href="@{/admin/users(page=${currentPage + 1}, size=${pageSize}, search=${searchQuery})}"
                                    th:if="${hasNext}"
                                    aria-label="Next">
                                     Next <i class="fas fa-chevron-right"></i>

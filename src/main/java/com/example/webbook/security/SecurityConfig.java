@@ -40,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/").permitAll()
 
                         // Admin only access
-                        .requestMatchers("/user/users", "/user/add", "/user/update", "/user/delete/**", "/user/dashboard").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // Customer access (both USER and ADMIN can access customer pages)
@@ -79,7 +78,7 @@ public class SecurityConfig {
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/user/add", "/user/update", "/user/delete/**", "/logout")
+                        .ignoringRequestMatchers("/admin/**")
                 );
 
         return http.build();

@@ -124,10 +124,10 @@ function populateAndShowModal(userData) {
     if (userData.image && userData.image.trim() !== '') {
         avatarImg.src = userData.image;
         avatarImg.onerror = function() {
-            this.src = '/images/default-avatar.png';
+            this.src = 'https://res.cloudinary.com/dso24g1vf/image/upload/v1759069674/default-avatar_m9jq5j.jpg';
         };
     } else {
-        avatarImg.src = '/images/default-avatar.png';
+        avatarImg.src = 'https://res.cloudinary.com/dso24g1vf/image/upload/v1759069674/default-avatar_m9jq5j.jpg';
     }
 
     // Show the modal

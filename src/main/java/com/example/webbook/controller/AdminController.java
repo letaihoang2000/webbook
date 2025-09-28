@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/admin")
 public class AdminController {
     @Autowired
     private UserService userService;

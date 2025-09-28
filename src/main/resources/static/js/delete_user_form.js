@@ -63,7 +63,7 @@ function deleteUser(userId, button, originalText) {
     console.log('Attempting to delete user:', userId); // Debug log
 
     // Make AJAX call to delete endpoint
-    fetch(`/user/delete/${userId}`, {
+    fetch(`/admin/delete/${userId}`, {
         method: 'DELETE',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',

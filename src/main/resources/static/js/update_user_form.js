@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.classList.add('btn-loading');
         submitButton.disabled = true;
 
-        fetch('/user/update', {
+        fetch('/admin/update', {
             method: 'POST',
             body: formData
         })
