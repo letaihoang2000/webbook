@@ -1,17 +1,18 @@
 package com.example.webbook.controller;
 
 
+import com.example.webbook.dto.AddBookForm;
 import com.example.webbook.dto.BookInfo;
 import com.example.webbook.model.Book;
 import com.example.webbook.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,5 +52,25 @@ public class BookController {
         model.addAttribute("endPage", endPage);
 
         return "users/admin/book_index";
+    }
+
+    @PostMapping("/add")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createBook(@ModelAttribute AddBookForm addBookForm) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Book newBook = bookService.createBook(addBookForm);
+            response.put("success", true);
+            response.put("message", "Book created successfully!");
+            response.put("bookId", newBook.getId().toString());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("errorType", "general");
+            response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while creating the book.");
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

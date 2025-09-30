@@ -1,8 +1,14 @@
 package com.example.webbook.service;
 
+import com.example.webbook.dto.AddBookForm;
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.model.Author;
+import com.example.webbook.model.Category;
+import com.example.webbook.repository.AuthorRepository;
 import com.example.webbook.repository.BookRepository;
 import com.example.webbook.model.Book;
+import com.example.webbook.repository.CategoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,14 +16,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class BookService {
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // Get paginated books with search support
     public Page<BookInfo> getBooksInfoPaginated(int page, int size, String searchBy, String searchQuery) {
@@ -78,6 +92,43 @@ public class BookService {
         paginationInfo.put("searchQuery", searchQuery);
 
         return paginationInfo;
+    }
+
+
+    @Transactional
+    public Book createBook(AddBookForm form) {
+        try {
+            Book book = new Book();
+            book.setTitle(form.getTitle());
+            book.setImage(form.getImage());
+            book.setDescription(form.getDescription());
+            book.setPublished_date(form.getPublished_date());
+            book.setPage(form.getPage());
+            book.setPrice(form.getPrice());
+            book.setBook_content(form.getBook_content());
+            book.setCreated_at(LocalDateTime.now());
+            book.setLast_updated(LocalDateTime.now());
+
+            // Set author
+            if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
+                UUID authorId = UUID.fromString(form.getAuthor());
+                Author author = authorRepository.findById(authorId)
+                        .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId));
+                book.setAuthor(author);
+            }
+
+            // Set category
+            if (form.getCategory_type() != null && !form.getCategory_type().trim().isEmpty()) {
+                Long categoryId = Long.parseLong(form.getCategory_type());
+                Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+                book.setCategory(category);
+            }
+
+            return bookRepository.save(book);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create book: " + e.getMessage());
+        }
     }
 
     // Convert Book entity to BookInfo DTO
