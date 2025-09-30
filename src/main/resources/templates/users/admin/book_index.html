@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Books</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/book_index.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<div class="wrapper d-flex align-items-stretch">
+    <div th:replace="~{fragments/admin_sidebar :: sidebar}"></div>
+
+    <!-- Page Content -->
+    <div id="content" class="p-4 p-md-5">
+        <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
+
+        <h2 class="mb-4">Books</h2>
+        <div class="container mt-4">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <div class="row align-items-center g-2">
+                        <div class="col-auto">
+                            <h4 class="mb-0"><i class="fas fa-book me-2"></i>View Books</h4>
+                        </div>
+
+                        <!-- Search by Title -->
+                        <div class="col-md-2">
+                            <div class="search-container">
+                                <input type="text"
+                                       id="titleSearch"
+                                       class="form-control search-input"
+                                       placeholder="Search by title..."
+                                       th:value="${searchBy == 'title' ? searchQuery : ''}">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Search by Author -->
+                        <div class="col-md-2">
+                            <div class="search-container">
+                                <input type="text"
+                                       id="authorSearch"
+                                       class="form-control search-input"
+                                       placeholder="Search by author..."
+                                       th:value="${searchBy == 'author' ? searchQuery : ''}">
+                                <i class="fas fa-user search-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Category -->
+                        <div class="col-md-2">
+                            <select id="categoryFilter" class="form-select category-select">
+                                <option value="">All Categories</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"
+                                        th:selected="${categoryId != null && categoryId == category.id}"></option>
+                            </select>
+                        </div>
+
+                        <div class="col-auto ms-auto">
+                            <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addBookForm">
+                                <i class="fas fa-plus me-1"></i> Create Book
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Pagination Info -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom" th:if="${!#lists.isEmpty(books)}">
+                        <div class="pagination-info">
+                            Showing <strong th:text="${currentPage * pageSize + 1}">1</strong> to
+                            <strong th:text="${#numbers.formatInteger((currentPage * pageSize + #lists.size(books)), 0)}">10</strong>
+                            of <strong th:text="${totalBooks}">50</strong> books
+                        </div>
+                        <div class="pagination-info">
+                            Page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">5</strong>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Price</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="book : ${books}">
+                                <td>
+                                    <img th:src="${book.image?.trim() ?: 'https://app.box.com/s/jtrxevyethgf2ln747bdve0kqkzth4g2'}"
+                                         class="book-image"
+                                         alt="Book Cover" src="">
+                                </td>
+                                <td>
+                                    <strong th:text="${book.title}"></strong>
+                                </td>
+                                <td>
+                                    <span th:text="${book.author_name ?: 'Unknown'}"></span>
+                                </td>
+                                <td>
+                                    <span class="text-success fw-bold" th:text="'$' + ${book.price}"></span>
+                                </td>
+                                <td class="text-center table-actions">
+                                    <div class="btn-group" role="group">
+                                        <a class="btn btn-outline-info btn-sm view-book-btn"
+                                           title="View Details"
+                                           th:attr="data-book-id=${book.book_id},
+                                                   data-title=${book.title},
+                                                   data-image=${book.image ?: ''},
+                                                   data-description=${book.description ?: ''},
+                                                   data-published-date=${book.published_date ?: ''},
+                                                   data-page=${book.page ?: ''},
+                                                   data-price=${book.price},
+                                                   data-book-content=${book.book_content ?: ''},
+                                                   data-author=${book.author_name ?: ''},
+                                                   data-category=${book.category_name ?: ''},
+                                                   data-last-updated=${book.last_updated ?: ''}">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-outline-warning btn-sm edit-book-btn"
+                                                data-toggle="modal"
+                                                data-target="#updateBookForm"
+                                                title="Edit"
+                                                th:attr="data-book-id=${book.book_id},
+                                                         data-title=${book.title},
+                                                         data-description=${book.description ?: ''},
+                                                         data-published-date=${book.published_date ?: ''},
+                                                         data-page=${book.page ?: ''},
+                                                         data-price=${book.price},
+                                                         data-image=${book.image ?: ''}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-danger btn-sm delete-book-btn"
+                                                title="Delete"
+                                                th:attr="data-book-id=${book.book_id},
+                                                         data-book-title=${book.title}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div th:if="${#lists.isEmpty(books)}" class="text-center py-5">
+                        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No books found</h5>
+                        <p class="text-muted">Click "Create Book" to add a new book</p>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addBookForm">
+                            <i class="fas fa-plus me-1"></i>Add Book
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pagination Navigation -->
+                <div class="card-footer bg-light" th:if="${totalPages > 1}">
+                    <nav aria-label="Book pagination navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/book/books(page=${currentPage - 1}, size=${pageSize}, searchBy=${searchBy}, search=${searchQuery})}"
+                                   th:if="${hasPrevious}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                                <span class="page-link" th:unless="${hasPrevious}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </span>
+                            </li>
+
+                            <li class="page-item" th:if="${startPage > 0}">
+                                <a class="page-link" th:href="@{/book/books(page=0, size=${pageSize}, searchBy=${searchBy}, search=${searchQuery})}">1</a>
+                            </li>
+
+                            <li class="page-item disabled" th:if="${startPage > 1}">
+                                <span class="page-link">...</span>
+                            </li>
+
+                            <li class="page-item"
+                                th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/book/books(page=${pageNum}, size=${pageSize}, searchBy=${searchBy}, search=${searchQuery})}"
+                                   th:text="${pageNum + 1}">1</a>
+                            </li>
+
+                            <li class="page-item disabled" th:if="${endPage < totalPages - 2}">
+                                <span class="page-link">...</span>
+                            </li>
+
+                            <li class="page-item" th:if="${endPage < totalPages - 1}">
+                                <a class="page-link"
+                                   th:href="@{/book/books(page=${totalPages - 1}, size=${pageSize}, searchBy=${searchBy}, search=${searchQuery})}"
+                                   th:text="${totalPages}">Last</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/book/books(page=${currentPage + 1}, size=${pageSize}, searchBy=${searchBy}, search=${searchQuery})}"
+                                   th:if="${hasNext}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <span class="page-link" th:unless="${hasNext}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-light" th:if="${!#lists.isEmpty(books) && totalPages <= 1}">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small class="text-muted">
+                                Total: <strong th:text="${totalBooks}">0</strong> books
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>Last updated:
+                                <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy hh:mm a')}"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{modals/admin/logout :: logoutModal}"></div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/popper.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/logout.js}"></script>
+<script th:src="@{/js/admin/book_index.js}"></script>
+
+</body>
+</html>

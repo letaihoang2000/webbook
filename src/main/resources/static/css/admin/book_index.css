@@ -1,0 +1,67 @@
+.book-image {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.table-actions {
+    white-space: nowrap;
+}
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.pagination-info {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+.search-container {
+    position: relative;
+}
+.search-input {
+    height: 40px;
+    border-radius: 25px;
+    padding-left: 40px;
+    padding-right: 15px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 14px;
+}
+.search-input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+.search-input:focus {
+    background-color: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+}
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+}
+.category-select {
+    height: 40px;
+    border-radius: 25px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 14px;
+    padding: 0 15px;
+}
+.category-select:focus {
+    background-color: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+}
+.category-select option {
+    background-color: #6c757d;
+    color: white;
+}

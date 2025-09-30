@@ -6,7 +6,7 @@
     <title>View Users</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/user_index.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/user_index.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="bg-light">
@@ -71,10 +71,9 @@
                             <tbody>
                             <tr th:each="user : ${users}">
                                 <td>
-                                    <img th:src="${user.image}"
+                                    <img th:src="${user.image?.trim() ?: 'https://res.cloudinary.com/dso24g1vf/image/upload/v1759069674/default-avatar_m9jq5j.jpg'}"
                                          class="user-avatar"
-                                         alt="Avatar"
-                                    >
+                                         alt="Avatar">
                                 </td>
                                 <td>
                                     <strong th:text="${user.first_name + ' ' + user.last_name}"></strong>
@@ -245,11 +244,11 @@
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/logout.js}"></script>
 
-<script th:src="@{/js/view_user_form.js}"></script>
-<script th:src="@{/js/search_user.js}"></script>
-<script th:src="@{/js/add_user_form.js}"></script>
-<script th:src="@{/js/update_user_form.js}"></script>
-<script th:src="@{/js/delete_user_form.js}"></script>
+<script th:src="@{/js/admin/view_user_form.js}"></script>
+<script th:src="@{/js/admin/search_user.js}"></script>
+<script th:src="@{/js/admin/add_user_form.js}"></script>
+<script th:src="@{/js/admin/update_user_form.js}"></script>
+<script th:src="@{/js/admin/delete_user_form.js}"></script>
 
 </body>
 </html>

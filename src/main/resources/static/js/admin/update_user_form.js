@@ -1,5 +1,3 @@
-// update_user_form.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const updateUserModal = document.getElementById('updateUserForm');
     const updateForm = updateUserModal.querySelector('form');
@@ -41,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateConfirmPasswordFeedback.textContent = 'Passwords do not match.';
     updateConfirmPasswordField.parentNode.appendChild(updateConfirmPasswordFeedback);
 
-    // Reuse functions from add_user_form.js
     function showUpdateError(message) {
         updateErrorDiv.textContent = message;
         updateErrorDiv.style.display = 'block';
