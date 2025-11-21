@@ -1,0 +1,46 @@
+<div th:fragment="updateCategoryModal" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="modal fade" id="updateCategoryForm" tabindex="-1" role="dialog"
+         aria-labelledby="updateCategoryTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <!-- Chỉ là form UI, không gửi đi đâu -->
+                <form>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateCategoryTitle">Update Category</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- ID (chỉ để trang trí, mai mốt xài thì xài, giờ không cần cũng được) -->
+                        <input type="hidden" id="updateCategoryId">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="updateCategoryName">Tên Category *</label>
+                            <input type="text"
+                                   id="updateCategoryName"
+                                   class="form-control"
+                                   placeholder="Nhập tên category...">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="button"
+                                class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
