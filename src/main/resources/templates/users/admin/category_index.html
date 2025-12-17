@@ -69,9 +69,10 @@
                 <td class="text-center">
                   <div class="btn-group" role="group">
                     <button type="button"
-                            class="btn btn-outline-warning btn-sm"
+                            class="btn btn-outline-warning btn-sm edit-category-btn"
                             data-toggle="modal"
-                            data-target="#updateCategoryForm">
+                            data-target="#updateCategoryForm"
+                            th:attr="data-id=${category.id}, data-name=${category.name}">
                       <i class="fas fa-edit"></i>
                     </button>
 
@@ -110,6 +111,7 @@
 <!-- MODAL ADD CATEGORY -->
 <div th:replace="~{modals/admin/add_category :: addCategoryModal}"></div>
 <div th:replace="~{modals/admin/update_category :: updateCategoryModal}"></div>
+
 <!-- JS giống trang Users -->
 <script th:src="@{/js/admin/update_category_form.js}"></script>
 <script th:src="@{/js/jquery.min.js}"></script>

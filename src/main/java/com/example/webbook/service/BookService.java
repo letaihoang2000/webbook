@@ -163,12 +163,12 @@ public class BookService {
     // Helper method to populate book from form
     private void populateBookFromForm(Book book, AddBookForm form) {
         book.setTitle(form.getTitle());
-        book.setImage(form.getImage());
+//        book.setImage(form.getImage());
         book.setDescription(form.getDescription());
         book.setPublished_date(form.getPublished_date());
         book.setPage(form.getPage());
         book.setPrice(form.getPrice());
-        book.setBook_content(form.getBook_content());
+//        book.setBook_content(form.getBook_content());
 
         // Set author
         if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {

@@ -1,17 +1,35 @@
 package com.example.webbook.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 
 public class AddBookForm {
     private String title;
-    private String image;
+    private MultipartFile imageFile;
     private String description;
     private LocalDate published_date;
     private Integer page;
     private Double price;
-    private String book_content;
+    private MultipartFile contentFile;
     private String author;
     private String category_type;
+
+    public MultipartFile getContentFile() {
+        return contentFile;
+    }
+
+    public void setContentFile(MultipartFile contentFile) {
+        this.contentFile = contentFile;
+    }
+
+    public MultipartFile getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(MultipartFile imageFile) {
+        this.imageFile = imageFile;
+    }
 
     public String getTitle() {
         return title;
@@ -21,13 +39,6 @@ public class AddBookForm {
         this.title = title;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public String getDescription() {
         return description;
@@ -59,14 +70,6 @@ public class AddBookForm {
 
     public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public String getBook_content() {
-        return book_content;
-    }
-
-    public void setBook_content(String book_content) {
-        this.book_content = book_content;
     }
 
     public String getAuthor() {

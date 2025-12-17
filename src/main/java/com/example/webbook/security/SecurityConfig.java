@@ -78,7 +78,7 @@ public class SecurityConfig {
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/admin/**","/logout")
+                        .ignoringRequestMatchers("/admin/**","/category/**","/logout")
                 );
 
         return http.build();

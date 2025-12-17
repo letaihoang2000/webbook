@@ -4,8 +4,11 @@
          aria-labelledby="addCategoryTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <!-- KHÔNG dùng th:object, th:action, chỉ frontend -->
-                <form id="categoryForm" onsubmit="return false;">
+                <!-- KẾT NỐI BACKEND: th:action + th:object -->
+                <form id="categoryForm"
+                      th:action="@{/category/add}"
+                      th:object="${categoryForm}"
+                      method="post">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addCategoryTitle">Create Category</h5>
                         <button type="button" class="close" data-dismiss="modal"
@@ -17,21 +20,13 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label" for="categoryName">Tên Category *</label>
+                            <!-- bind với AddCategoryForm.name -->
                             <input type="text"
                                    id="categoryName"
-                                   name="name"
+                                   th:field="*{name}"
                                    class="form-control"
                                    required />
                         </div>
-
-                        <!-- Nếu muốn thêm description:
-                        <div class="mb-3">
-                            <label class="form-label" for="categoryDescription">Mô tả</label>
-                            <textarea id="categoryDescription"
-                                      name="description"
-                                      class="form-control"></textarea>
-                        </div>
-                        -->
                     </div>
 
                     <div class="modal-footer">
@@ -42,7 +37,7 @@
                         </button>
                         <button type="submit"
                                 class="btn btn-primary">
-                            Save (dummy)
+                            Save
                         </button>
                     </div>
                 </form>

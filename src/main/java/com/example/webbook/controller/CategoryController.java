@@ -2,12 +2,17 @@ package com.example.webbook.controller;
 
 import com.example.webbook.dto.AddCategoryForm;
 import com.example.webbook.model.Category;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import com.example.webbook.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/category")
@@ -18,46 +23,58 @@ public class CategoryController {
     // Hiển thị danh sách categories
     @GetMapping
     public String listCategories(Model model) {
+
+        // Danh sách category
         model.addAttribute("categories", categoryService.getAllCategories());
+
+        // QUAN TRỌNG: đảm bảo luôn có categoryForm trong model
+        if (!model.containsAttribute("categoryForm")) {
+            model.addAttribute("categoryForm", new AddCategoryForm());
+        }
+
         return "users/admin/category_index"; // Trả về view list.html
     }
 
-    // Hiển thị form thêm category
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("categoryForm", new AddCategoryForm());
-        return "category/add"; // Trả về view add.html
-    }
 
-    // Xử lý thêm category
     @PostMapping("/add")
-    public String addCategory(@ModelAttribute AddCategoryForm form, RedirectAttributes redirectAttributes) {
+    public String addCategory(@ModelAttribute("categoryForm") AddCategoryForm form,
+                              RedirectAttributes redirectAttributes) {
         categoryService.addCategory(form);
         redirectAttributes.addFlashAttribute("message", "Thêm category thành công!");
+        // để modal Add tiếp tục dùng được khi reload
+        redirectAttributes.addFlashAttribute("categoryForm", new AddCategoryForm());
         return "redirect:/category";
     }
 
     // Hiển thị form sửa category
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        Category category = categoryService.getCategoryById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    @PostMapping("/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateCategoryAjax(
+            @RequestParam("id") Long id,
+            @RequestParam("name") String name) {
 
-        AddCategoryForm form = new AddCategoryForm();
-        form.setName(category.getName());
+        Map<String, Object> response = new HashMap<>();
 
-        model.addAttribute("categoryForm", form);
-        model.addAttribute("categoryId", id);
-        return "category/edit"; // Trả về view edit.html
-    }
+        try {
+            AddCategoryForm form = new AddCategoryForm();
+            form.setName(name);
 
-    // Xử lý cập nhật category
-    @PostMapping("/edit/{id}")
-    public String updateCategory(@PathVariable Long id, @ModelAttribute AddCategoryForm form,
-                                 RedirectAttributes redirectAttributes) {
-        categoryService.updateCategory(id, form);
-        redirectAttributes.addFlashAttribute("message", "Cập nhật category thành công!");
-        return "redirect:/category";
+            categoryService.updateCategory(id, form);
+
+            response.put("success", true);
+            response.put("message", "Category updated successfully!");
+            response.put("id", id);
+            response.put("name", name);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message",
+                    e.getMessage() != null ? e.getMessage()
+                            : "An unexpected error occurred while updating the category.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     // Xóa category

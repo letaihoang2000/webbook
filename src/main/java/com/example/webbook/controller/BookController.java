@@ -105,12 +105,12 @@ public class BookController {
             // Create form and populate with existing data
             AddBookForm bookForm = new AddBookForm();
             bookForm.setTitle(book.getTitle());
-            bookForm.setImage(book.getImage());
+//            bookForm.setImage(book.getImage());
             bookForm.setDescription(book.getDescription());
             bookForm.setPublished_date(book.getPublished_date());
             bookForm.setPage(book.getPage());
             bookForm.setPrice(book.getPrice());
-            bookForm.setBook_content(book.getBook_content());
+//            bookForm.setBook_content(book.getBook_content());
 
             if (book.getAuthor() != null) {
                 bookForm.setAuthor(book.getAuthor().getId().toString());
