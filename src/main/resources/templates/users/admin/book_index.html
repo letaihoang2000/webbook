@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>View Books</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -139,7 +141,10 @@
                                                          data-published-date=${book.published_date ?: ''},
                                                          data-page=${book.page ?: ''},
                                                          data-price=${book.price},
-                                                         data-image=${book.image ?: ''}">
+                                                         data-image=${book.image ?: ''},
+                                                         data-book-content=${book.book_content ?: ''},
+                                                         data-author-name=${book.author_name ?: ''},
+                                                         data-category-id=${book.category_id ?: ''}">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button type="button"
@@ -244,6 +249,9 @@
 </div>
 
 <div th:replace="~{modals/admin/add_book :: addBookModal}"></div>
+<div th:replace="~{modals/admin/view_book :: viewBookModal}"></div>
+<div th:replace="~{modals/admin/update_book :: updateBookModal}"></div>
+<div th:replace="~{modals/admin/delete_book :: deleteBookModal}"></div>
 <div th:replace="~{modals/admin/logout :: logoutModal}"></div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
@@ -252,6 +260,10 @@
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/logout.js}"></script>
 <script th:src="@{/js/admin/book_index.js}"></script>
+<script th:src="@{/js/admin/add_book_form.js}"></script>
+<script th:src="@{/js/admin/view_book.js}"></script>
+<script th:src="@{/js/admin/update_book_form.js}"></script>
+<script th:src="@{/js/admin/delete_book.js}"></script>
 
 </body>
 </html>

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -33,6 +34,9 @@ public class BookService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private SupabaseStorageService supabaseStorageService;
 
     // Get paginated books with search support
     public Page<BookInfo> getBooksInfoPaginated(int page, int size, String searchBy, String searchQuery) {
@@ -106,92 +110,125 @@ public class BookService {
         return convertToBookInfo(book);
     }
 
-    // Create book
     @Transactional
-    public Book createBook(AddBookForm form) {
-        try {
-            Book book = new Book();
-            populateBookFromForm(book, form);
-            book.setCreated_at(LocalDateTime.now());
-            book.setLast_updated(LocalDateTime.now());
+    public Book createBook(AddBookForm form) throws IOException {
+        Book book = new Book();
 
-            return bookRepository.save(book);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create book: " + e.getMessage());
-        }
-    }
-
-    // Update book
-    @Transactional
-    public Book updateBook(UUID id, AddBookForm form) {
-        try {
-            Book book = getBookById(id);
-            populateBookFromForm(book, form);
-            book.setLast_updated(LocalDateTime.now());
-
-            return bookRepository.save(book);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update book: " + e.getMessage());
-        }
-    }
-
-    // Delete book
-    @Transactional
-    public void deleteBook(UUID id) {
-        try {
-            Book book = getBookById(id);
-            bookRepository.delete(book);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete book: " + e.getMessage());
-        }
-    }
-
-    // Delete multiple books
-    @Transactional
-    public void deleteBooks(List<UUID> ids) {
-        try {
-            List<Book> books = bookRepository.findAllById(ids);
-            if (books.isEmpty()) {
-                throw new RuntimeException("No books found with provided ids");
-            }
-            bookRepository.deleteAll(books);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete books: " + e.getMessage());
-        }
-    }
-
-    // Helper method to populate book from form
-    private void populateBookFromForm(Book book, AddBookForm form) {
+        // Set basic fields
         book.setTitle(form.getTitle());
-//        book.setImage(form.getImage());
         book.setDescription(form.getDescription());
         book.setPublished_date(form.getPublished_date());
         book.setPage(form.getPage());
         book.setPrice(form.getPrice());
-//        book.setBook_content(form.getBook_content());
 
-        // Set author
-        if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
-            UUID authorId = UUID.fromString(form.getAuthor());
-            Author author = authorRepository.findById(authorId)
-                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId));
-            book.setAuthor(author);
-        } else {
-            book.setAuthor(null);
+        // Upload image if provided - using book title as filename
+        if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
+            String imageUrl = supabaseStorageService.uploadBookImage(form.getImageFile(), form.getTitle());
+            book.setImage(imageUrl);
         }
 
-        // Set category
+        // Upload PDF if provided - using book title as filename
+        if (form.getContentFile() != null && !form.getContentFile().isEmpty()) {
+            String pdfUrl = supabaseStorageService.uploadBookContent(form.getContentFile(), form.getTitle());
+            book.setBook_content(pdfUrl);
+        }
+
+        // Find and set author
+        if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
+            Author author = authorRepository.findByName(form.getAuthor())
+                    .orElseThrow(() -> new RuntimeException("Author not found: " + form.getAuthor()));
+            book.setAuthor(author);
+        }
+
+        // Find and set category
         if (form.getCategory_type() != null && !form.getCategory_type().trim().isEmpty()) {
             Long categoryId = Long.parseLong(form.getCategory_type());
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
             book.setCategory(category);
-        } else {
-            book.setCategory(null);
         }
+
+        book.setCreated_at(LocalDateTime.now());
+        book.setLast_updated(LocalDateTime.now());
+
+        return bookRepository.save(book);
     }
 
-    // Convert Book entity to BookInfo DTO
+    @Transactional
+    public Book updateBook(UUID id, AddBookForm form) throws IOException {
+        Book book = getBookById(id);
+        String oldImageUrl = book.getImage();
+        String oldContentUrl = book.getBook_content();
+        String oldTitle = book.getTitle();
+
+        // Update basic fields
+        book.setTitle(form.getTitle());
+        book.setDescription(form.getDescription());
+        book.setPublished_date(form.getPublished_date());
+        book.setPage(form.getPage());
+        book.setPrice(form.getPrice());
+
+        // Update image if new one provided
+        if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
+            String newImageUrl = supabaseStorageService.uploadBookImage(form.getImageFile(), form.getTitle());
+            book.setImage(newImageUrl);
+
+            // Delete old image (only if title changed or it's a different file)
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                supabaseStorageService.deleteFile(oldImageUrl);
+            }
+        } else if (!oldTitle.equals(form.getTitle()) && oldImageUrl != null) {
+            // Title changed but no new image - we might want to rename the file
+            // For now, keep the old URL
+        }
+
+        // Update PDF if new one provided
+        if (form.getContentFile() != null && !form.getContentFile().isEmpty()) {
+            String newContentUrl = supabaseStorageService.uploadBookContent(form.getContentFile(), form.getTitle());
+            book.setBook_content(newContentUrl);
+
+            // Delete old PDF
+            if (oldContentUrl != null && !oldContentUrl.isEmpty()) {
+                supabaseStorageService.deleteFile(oldContentUrl);
+            }
+        } else if (!oldTitle.equals(form.getTitle()) && oldContentUrl != null) {
+            // Title changed but no new content - we might want to rename the file
+            // For now, keep the old URL
+        }
+
+        // Update author and category
+        if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
+            Author author = authorRepository.findByName(form.getAuthor())
+                    .orElseThrow(() -> new RuntimeException("Author not found: " + form.getAuthor()));
+            book.setAuthor(author);
+        }
+
+        if (form.getCategory_type() != null && !form.getCategory_type().trim().isEmpty()) {
+            Long categoryId = Long.parseLong(form.getCategory_type());
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+            book.setCategory(category);
+        }
+
+        book.setLast_updated(LocalDateTime.now());
+        return bookRepository.save(book);
+    }
+
+    @Transactional
+    public void deleteBook(UUID id) {
+        Book book = getBookById(id);
+
+        // Delete files from Supabase before deleting book record
+        if (book.getImage() != null && !book.getImage().isEmpty()) {
+            supabaseStorageService.deleteFile(book.getImage());
+        }
+        if (book.getBook_content() != null && !book.getBook_content().isEmpty()) {
+            supabaseStorageService.deleteFile(book.getBook_content());
+        }
+
+        bookRepository.delete(book);
+    }
+
     private BookInfo convertToBookInfo(Book book) {
         BookInfo bookInfo = new BookInfo();
         bookInfo.setBook_id(book.getId().toString());
@@ -220,163 +257,13 @@ public class BookService {
             bookInfo.setAuthor_name(book.getAuthor().getName());
         }
 
-        // Set category name
+        // Set category name and ID
         if (book.getCategory() != null) {
             bookInfo.setCategory_name(book.getCategory().getName());
+            bookInfo.setCategory_id(book.getCategory().getId().toString());  // Add this line
         }
 
         return bookInfo;
     }
 }
 
-
-
-
-//@Service
-//public class BookService {
-//    @Autowired
-//    private BookRepository bookRepository;
-//
-//    @Autowired
-//    private AuthorRepository authorRepository;
-//
-//    @Autowired
-//    private CategoryRepository categoryRepository;
-//
-//    // Get paginated books with search support
-//    public Page<BookInfo> getBooksInfoPaginated(int page, int size, String searchBy, String searchQuery) {
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
-//        Page<Book> bookPage;
-//
-//        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-//            String trimmedQuery = searchQuery.trim();
-//
-//            if ("title".equalsIgnoreCase(searchBy)) {
-//                bookPage = bookRepository.findByTitleContainingIgnoreCase(trimmedQuery, pageable);
-//            } else if ("author".equalsIgnoreCase(searchBy)) {
-//                bookPage = bookRepository.findByAuthorNameContainingIgnoreCase(trimmedQuery, pageable);
-//            } else {
-//                // Default: search all books
-//                bookPage = bookRepository.findAllBooks(pageable);
-//            }
-//        } else {
-//            bookPage = bookRepository.findAllBooks(pageable);
-//        }
-//
-//        return bookPage.map(this::convertToBookInfo);
-//    }
-//
-//    // Overloaded method for backward compatibility
-//    public Page<BookInfo> getBooksInfoPaginated(int page, int size) {
-//        return getBooksInfoPaginated(page, size, null, null);
-//    }
-//
-//    // Get pagination info
-//    public Map<String, Object> getPaginationInfo(int currentPage, int pageSize, String searchBy, String searchQuery) {
-//        long totalBooks;
-//
-//        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-//            String trimmedQuery = searchQuery.trim();
-//
-//            if ("title".equalsIgnoreCase(searchBy)) {
-//                totalBooks = bookRepository.countByTitleContaining(trimmedQuery);
-//            } else if ("author".equalsIgnoreCase(searchBy)) {
-//                totalBooks = bookRepository.countByAuthorNameContaining(trimmedQuery);
-//            } else {
-//                totalBooks = bookRepository.countAllBooks();
-//            }
-//        } else {
-//            totalBooks = bookRepository.countAllBooks();
-//        }
-//
-//        int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
-//
-//        Map<String, Object> paginationInfo = new HashMap<>();
-//        paginationInfo.put("currentPage", currentPage);
-//        paginationInfo.put("pageSize", pageSize);
-//        paginationInfo.put("totalBooks", totalBooks);
-//        paginationInfo.put("totalPages", totalPages);
-//        paginationInfo.put("hasPrevious", currentPage > 0);
-//        paginationInfo.put("hasNext", currentPage < totalPages - 1);
-//        paginationInfo.put("searchBy", searchBy);
-//        paginationInfo.put("searchQuery", searchQuery);
-//
-//        return paginationInfo;
-//    }
-//
-//
-//    @Transactional
-//    public Book createBook(AddBookForm form) {
-//        try {
-//            Book book = new Book();
-//            book.setTitle(form.getTitle());
-//            book.setImage(form.getImage());
-//            book.setDescription(form.getDescription());
-//            book.setPublished_date(form.getPublished_date());
-//            book.setPage(form.getPage());
-//            book.setPrice(form.getPrice());
-//            book.setBook_content(form.getBook_content());
-//            book.setCreated_at(LocalDateTime.now());
-//            book.setLast_updated(LocalDateTime.now());
-//
-//            // Set author
-//            if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
-//                UUID authorId = UUID.fromString(form.getAuthor());
-//                Author author = authorRepository.findById(authorId)
-//                        .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId));
-//                book.setAuthor(author);
-//            }
-//
-//            // Set category
-//            if (form.getCategory_type() != null && !form.getCategory_type().trim().isEmpty()) {
-//                Long categoryId = Long.parseLong(form.getCategory_type());
-//                Category category = categoryRepository.findById(categoryId)
-//                        .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
-//                book.setCategory(category);
-//            }
-//
-//            return bookRepository.save(book);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to create book: " + e.getMessage());
-//        }
-//    }
-//
-//    // Convert Book entity to BookInfo DTO
-//    private BookInfo convertToBookInfo(Book book) {
-//        BookInfo bookInfo = new BookInfo();
-//        bookInfo.setBook_id(book.getId().toString());
-//        bookInfo.setTitle(book.getTitle());
-//        bookInfo.setImage(book.getImage());
-//        bookInfo.setDescription(book.getDescription());
-//
-//        System.out.println(bookInfo.getImage());
-//
-//        // Format published_date
-//        if (book.getPublished_date() != null) {
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//            bookInfo.setPublished_date(book.getPublished_date().format(formatter));
-//        }
-//
-//        bookInfo.setPage(book.getPage() != null ? book.getPage().toString() : "N/A");
-//        bookInfo.setPrice(book.getPrice());
-//        bookInfo.setBook_content(book.getBook_content());
-//
-//        // Format last_updated
-//        if (book.getLast_updated() != null) {
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
-//            bookInfo.setLast_updated(book.getLast_updated().format(formatter));
-//        }
-//
-//        // Set author name
-//        if (book.getAuthor() != null) {
-//            bookInfo.setAuthor_name(book.getAuthor().getName());
-//        }
-//
-//        // Set category name
-//        if (book.getCategory() != null) {
-//            bookInfo.setCategory_name(book.getCategory().getName());
-//        }
-//
-//        return bookInfo;
-//    }
-//}

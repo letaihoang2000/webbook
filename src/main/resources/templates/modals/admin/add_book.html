@@ -1,11 +1,9 @@
-<!-- templates/modals/admin/add_book.html -->
 <div th:fragment="addBookModal" xmlns:th="http://www.thymeleaf.org">
     <div class="modal fade" id="addBookForm" tabindex="-1" role="dialog"
          aria-labelledby="addBookModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
-                <!-- Chỉ là khung UI, chưa nối backend -->
-                <form id="bookForm">
+                <form id="bookForm" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addBookModalTitle">Create Book</h5>
                         <button type="button" class="close" data-dismiss="modal"
@@ -20,7 +18,7 @@
                             <div class="col-md-8 mb-3">
                                 <label class="form-label" for="title">Title *</label>
                                 <input type="text" id="title" name="title"
-                                       class="form-control" />
+                                       class="form-control" required />
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label" for="published_date">Published Date</label>
@@ -33,26 +31,21 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="author">Author *</label>
-                                <select id="author" name="author" class="form-select">
+                                <select id="author" name="author" class="form-select" required>
                                     <option value="">-- Select Author --</option>
-
-                                    <!-- Author list sample (UI only) -->
-                                    <option value="J.K. Rowling">J.K. Rowling</option>
-                                    <option value="George Orwell">George Orwell</option>
-                                    <option value="Haruki Murakami">Haruki Murakami</option>
-                                    <option value="Stephen King">Stephen King</option>
-                                    <option value="Unknown">Unknown</option>
+                                    <option th:each="author : ${authors}"
+                                            th:value="${author.name}"
+                                            th:text="${author.name}">Author Name</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="category_type">Category *</label>
-                                <!-- Tạm thời dùng option fake, sau này thay bằng dữ liệu thật -->
                                 <select id="category_type" name="category_type"
-                                        class="form-select">
+                                        class="form-select" required>
                                     <option value="">-- Select Category --</option>
-                                    <option value="novel">Novel</option>
-                                    <option value="tech">Tech</option>
-                                    <option value="comic">Comic</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}">Category Name</option>
                                 </select>
                             </div>
                         </div>
@@ -62,7 +55,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="page">Page</label>
                                 <input type="number" id="page" name="page"
-                                       class="form-control" />
+                                       class="form-control" min="1" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="price">Price</label>
@@ -78,11 +71,21 @@
                                 <label class="form-label" for="imageFile">Cover Image</label>
                                 <input type="file" id="imageFile" name="imageFile"
                                        class="form-control" accept="image/*" />
+                                <small class="text-muted">Max 10MB (jpg, png, webp)</small>
+                                <div id="imagePreview" class="mt-2" style="display: none;">
+                                    <img src="" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 4px;">
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="contentFile">Content File (PDF)</label>
                                 <input type="file" id="contentFile" name="contentFile"
                                        class="form-control" accept="application/pdf" />
+                                <small class="text-muted">Max 50MB</small>
+                                <div id="pdfInfo" class="mt-2 text-muted" style="display: none;">
+                                    <i class="fas fa-file-pdf me-1"></i>
+                                    <span id="pdfName"></span>
+                                    <span id="pdfSize" class="ms-2"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -95,11 +98,10 @@
                     </div>
 
                     <div class="modal-footer">
-                        <!-- Chưa submit đâu, chỉ đóng/mở modal -->
                         <button type="button" class="btn btn-secondary"
                                 data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary">
-                            Create (UI Only)
+                            <i class="fas fa-plus me-1"></i>Create Book
                         </button>
                     </div>
                 </form>
