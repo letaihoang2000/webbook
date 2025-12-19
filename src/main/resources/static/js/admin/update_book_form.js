@@ -285,7 +285,7 @@ $(document).ready(function() {
                 // Reload page after short delay
                 setTimeout(function() {
                     window.location.reload();
-                }, 1500);
+                }, 2500);
             } else {
                 showErrorMessage(result.data.message || 'Failed to update book');
                 $submitBtn.prop('disabled', false).html(originalText);

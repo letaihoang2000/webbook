@@ -3,6 +3,7 @@ package com.example.webbook.controller;
 
 import com.example.webbook.dto.AddBookForm;
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.dto.UpdateBookForm;
 import com.example.webbook.model.Book;
 import com.example.webbook.repository.AuthorRepository;
 import com.example.webbook.repository.CategoryRepository;
@@ -123,32 +124,30 @@ public class BookController {
         }
     }
 
-    // Show edit book form
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") String id, Model model) {
         try {
             UUID bookId = UUID.fromString(id);
-            BookInfo bookInfo = bookService.getBookInfoById(bookId);
             Book book = bookService.getBookById(bookId);
 
-            // Create form and populate with existing data
-            AddBookForm bookForm = new AddBookForm();
+            // Create UpdateBookForm and populate with existing data
+            UpdateBookForm bookForm = new UpdateBookForm();
+            bookForm.setBook_id(id);
             bookForm.setTitle(book.getTitle());
-//            bookForm.setImage(book.getImage());
             bookForm.setDescription(book.getDescription());
             bookForm.setPublished_date(book.getPublished_date());
             bookForm.setPage(book.getPage());
             bookForm.setPrice(book.getPrice());
-//            bookForm.setBook_content(book.getBook_content());
 
             if (book.getAuthor() != null) {
-                bookForm.setAuthor(book.getAuthor().getId().toString());
+                bookForm.setAuthor(book.getAuthor().getName()); // Use author name, not ID
             }
             if (book.getCategory() != null) {
                 bookForm.setCategory_type(book.getCategory().getId().toString());
             }
 
             model.addAttribute("bookForm", bookForm);
+            model.addAttribute("book", book); // Add book for displaying current image/pdf
             model.addAttribute("bookId", id);
             model.addAttribute("authors", authorRepository.findAll());
             model.addAttribute("categories", categoryRepository.findAll());
@@ -160,17 +159,17 @@ public class BookController {
         }
     }
 
-    // Update book
+    // Update book - Use UpdateBookForm
     @PostMapping("/update/{id}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateBook(
             @PathVariable("id") String id,
-            @ModelAttribute AddBookForm addBookForm) {
+            @ModelAttribute UpdateBookForm updateBookForm) {
         Map<String, Object> response = new HashMap<>();
 
         try {
             UUID bookId = UUID.fromString(id);
-            Book updatedBook = bookService.updateBook(bookId, addBookForm);
+            Book updatedBook = bookService.updateBook(bookId, updateBookForm);
 
             response.put("success", true);
             response.put("message", "Book updated successfully!");
@@ -178,21 +177,18 @@ public class BookController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
-            // Validation errors (file size, type, etc.)
             response.put("success", false);
             response.put("errorType", "validation");
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
 
         } catch (IOException e) {
-            // File upload errors
             response.put("success", false);
             response.put("errorType", "upload");
             response.put("message", "Failed to upload files: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
 
         } catch (Exception e) {
-            // General errors
             response.put("success", false);
             response.put("errorType", "general");
             response.put("message", e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while updating the book.");
@@ -206,7 +202,14 @@ public class BookController {
         try {
             UUID bookId = UUID.fromString(id);
             BookInfo bookInfo = bookService.getBookInfoById(bookId);
+
+            // Add book info
             model.addAttribute("book", bookInfo);
+
+            // Add categories and authors for update modal dropdowns
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("authors", authorService.getAllAuthors());
+
             return "users/admin/book_detail";
         } catch (Exception e) {
             model.addAttribute("error", "Book not found");

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="addAuthorModal">
+    <div class="modal fade" id="addAuthorForm" tabindex="-1" role="dialog"
+         aria-labelledby="addAuthorModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <form id="authorForm" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addAuthorModalTitle">
+                            <i class="fas fa-user-plus me-2"></i>Add Author
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label class="form-label" for="authorName">
+                                Author Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="authorName" name="name"
+                                   class="form-control" required
+                                   placeholder="Enter author name" />
+                        </div>
+
+                        <!-- Image -->
+                        <div class="mb-3">
+                            <label class="form-label" for="authorImageFile">Author Image</label>
+                            <input type="file" id="authorImageFile" name="image_file"
+                                   class="form-control" accept="image/*" />
+                            <small class="text-muted">Max 5MB (jpg, png, webp)</small>
+                            <div id="authorImagePreview" class="mt-2" style="display: none;">
+                                <img src="" alt="Preview"
+                                     style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label" for="authorDescription">Description</label>
+                            <textarea id="authorDescription" name="description"
+                                      class="form-control" rows="4"
+                                      placeholder="Enter author description..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add Author
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

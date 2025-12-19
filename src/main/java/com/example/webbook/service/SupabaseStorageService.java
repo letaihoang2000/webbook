@@ -44,7 +44,8 @@ public class SupabaseStorageService {
 
     /**
      * Upload book cover image to Supabase Storage using book title as filename
-     * @param file The image file to upload
+     *
+     * @param file      The image file to upload
      * @param bookTitle The title of the book (will be used as filename)
      * @return Public URL of the uploaded image
      */
@@ -87,7 +88,8 @@ public class SupabaseStorageService {
 
     /**
      * Upload book content (PDF) to Supabase Storage using book title as filename
-     * @param file The PDF file to upload
+     *
+     * @param file      The PDF file to upload
      * @param bookTitle The title of the book (will be used as filename)
      * @return Public URL of the uploaded PDF
      */
@@ -121,7 +123,8 @@ public class SupabaseStorageService {
 
     /**
      * Upload author image to Supabase Storage using author name as filename
-     * @param file The image file to upload
+     *
+     * @param file       The image file to upload
      * @param authorName The name of the author (will be used as filename)
      * @return Public URL of the uploaded image
      */
@@ -198,10 +201,13 @@ public class SupabaseStorageService {
         // URL encode the file path to handle spaces and special characters
         String encodedPath = encodeFilePath(filePath);
 
-        // URL format: https://jvrpympmziwwpedpoagx.supabase.co/storage/v1/object/book_content/book_image/Book%20Title.jpg
         String url = supabaseUrl + "/storage/v1/object/" + bucket + "/" + encodedPath;
 
+        System.out.println("=== UPLOAD FILE OPERATION ===");
         System.out.println("Uploading to: " + url);
+        System.out.println("File path: " + filePath);
+        System.out.println("Content type: " + contentType);
+        System.out.println("File size: " + fileData.length + " bytes");
 
         RequestBody body = RequestBody.create(fileData, MediaType.parse(contentType));
 
@@ -211,20 +217,25 @@ public class SupabaseStorageService {
                 .addHeader("Authorization", "Bearer " + supabaseKey)
                 .addHeader("Content-Type", contentType)
                 .addHeader("apikey", supabaseKey)
-                .addHeader("x-upsert", "true")
+                .addHeader("x-upsert", "true")  // This should overwrite existing files
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "No response body";
+
             if (!response.isSuccessful()) {
-                String errorBody = response.body() != null ? response.body().string() : "Unknown error";
-                System.err.println("Upload failed: " + errorBody);
-                throw new IOException("Failed to upload file to Supabase: " + response.code() + " - " + errorBody);
+                System.err.println("Upload failed!");
+                System.err.println("Response code: " + response.code());
+                System.err.println("Response body: " + responseBody);
+                throw new IOException("Failed to upload file to Supabase: " + response.code() + " - " + responseBody);
             }
 
-            String responseBody = response.body() != null ? response.body().string() : "";
-            System.out.println("Upload successful: " + responseBody);
+            System.out.println("✓ Upload successful!");
+            System.out.println("Response: " + responseBody);
         }
+        System.out.println("=== END UPLOAD OPERATION ===\n");
     }
+
 
     /**
      * Delete a file from Supabase Storage
@@ -232,34 +243,50 @@ public class SupabaseStorageService {
      */
     public void deleteFile(String fileUrl) {
         if (fileUrl == null || fileUrl.isEmpty()) {
+            System.out.println("Delete skipped: fileUrl is null or empty");
             return;
         }
 
         try {
-            String filePath = extractFilePathFromUrl(fileUrl);
-            String encodedPath = encodeFilePath(filePath);
+            System.out.println("=== DELETE FILE OPERATION ===");
+            System.out.println("File URL to delete: " + fileUrl);
 
-            String url = supabaseUrl + "/storage/v1/object/" + bucket + "/" + encodedPath;
+            String filePath = extractFilePathFromUrl(fileUrl);
+            System.out.println("Extracted file path: " + filePath);
+
+            String encodedPath = encodeFilePath(filePath);
+            System.out.println("Encoded file path: " + encodedPath);
+
+            String deleteUrl = supabaseUrl + "/storage/v1/object/" + bucket + "/" + encodedPath;
+            System.out.println("Delete URL: " + deleteUrl);
 
             Request request = new Request.Builder()
-                    .url(url)
+                    .url(deleteUrl)
                     .delete()
                     .addHeader("Authorization", "Bearer " + supabaseKey)
                     .addHeader("apikey", supabaseKey)
                     .build();
 
             try (Response response = client.newCall(request).execute()) {
+                String responseBody = response.body() != null ? response.body().string() : "No response body";
+
                 if (!response.isSuccessful()) {
-                    System.err.println("Failed to delete file from Supabase: " + response.code());
+                    System.err.println("Failed to delete file from Supabase");
+                    System.err.println("Response code: " + response.code());
+                    System.err.println("Response body: " + responseBody);
                 } else {
-                    System.out.println("File deleted successfully: " + filePath);
+                    System.out.println("✓ File deleted successfully: " + filePath);
+                    System.out.println("Response: " + responseBody);
                 }
             }
+            System.out.println("=== END DELETE OPERATION ===\n");
+
         } catch (Exception e) {
-            // Log error but don't throw - deletion failures shouldn't block operations
-            System.err.println("Failed to delete file from Supabase: " + e.getMessage());
+            System.err.println("Exception during file deletion: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
     /**
      * URL encode file path to handle spaces and special characters
@@ -354,4 +381,91 @@ public class SupabaseStorageService {
     public double getFileSizeInMB(MultipartFile file) {
         return (double) file.getSize() / (1024 * 1024);
     }
+
+    /**
+     * Download a file from Supabase Storage
+     *
+     * @param fileUrl The public URL of the file
+     * @return File bytes
+     */
+    public byte[] downloadFile(String fileUrl) throws IOException {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return null;
+        }
+
+        Request request = new Request.Builder()
+                .url(fileUrl)
+                .get()
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to download file: " + response.code());
+            }
+
+            return response.body() != null ? response.body().bytes() : null;
+        }
+    }
+
+    /**
+     * Upload book image from byte array (for renaming operations)
+     *
+     * @param fileData    The image bytes
+     * @param bookTitle   The title of the book (will be used as filename)
+     * @param extension   File extension (e.g., ".jpg")
+     * @param contentType MIME type
+     * @return Public URL of the uploaded image
+     */
+    public String uploadBookImageFromBytes(byte[] fileData, String bookTitle, String extension, String contentType) throws IOException {
+        if (fileData == null || fileData.length == 0) {
+            return null;
+        }
+
+        // Sanitize book title for filename
+        String sanitizedTitle = sanitizeFilename(bookTitle);
+        String filename = sanitizedTitle + extension;
+
+        // Full path: book_image/BookTitle.jpg
+        String fullPath = bookImageFolder + "/" + filename;
+
+        // Upload to Supabase
+        uploadToSupabase(fullPath, fileData, contentType);
+
+        // Return public URL
+        return getPublicUrl(fullPath);
+    }
+
+    /**
+     * Upload book content from byte array (for renaming operations)
+     *
+     * @param fileData  The PDF bytes
+     * @param bookTitle The title of the book (will be used as filename)
+     * @return Public URL of the uploaded PDF
+     */
+    public String uploadBookContentFromBytes(byte[] fileData, String bookTitle) throws IOException {
+        if (fileData == null || fileData.length == 0) {
+            return null;
+        }
+
+        // Sanitize book title for filename
+        String sanitizedTitle = sanitizeFilename(bookTitle);
+        String filename = sanitizedTitle + ".pdf";
+
+        // Full path: book_content/BookTitle.pdf
+        String fullPath = bookContentFolder + "/" + filename;
+
+        // Upload to Supabase
+        uploadToSupabase(fullPath, fileData, "application/pdf");
+
+        // Return public URL
+        return getPublicUrl(fullPath);
+    }
+
+    /**
+     * Public method to access sanitizeFilename (for use in BookService)
+     */
+    public String sanitizeFilenamePublic(String filename) {
+        return sanitizeFilename(filename);
+    }
 }
+

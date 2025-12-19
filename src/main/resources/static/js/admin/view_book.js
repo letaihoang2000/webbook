@@ -20,6 +20,9 @@ $(document).ready(function() {
         console.log('Title:', title);
         console.log('PDF URL:', bookContent);
 
+        // Store book ID in hidden field for "View Full Details" button
+        $('#current_book_id').val(bookId);
+
         // Populate book details
         $('#view_book_title').text(title || 'Untitled');
         $('#view_book_author').text(author || 'Unknown');
@@ -64,6 +67,9 @@ $(document).ready(function() {
             $('#view_pdf_download').hide();
         }
 
+        // Set the "View Full Details" button link
+        $('#view_full_details_btn').attr('href', '/book/view/' + bookId);
+
         // Show the modal
         $('#viewBookModal').modal('show');
     });
@@ -72,5 +78,7 @@ $(document).ready(function() {
     $('#viewBookModal').on('hidden.bs.modal', function() {
         console.log('Modal closed, clearing PDF preview');
         $('#pdf_preview_iframe').attr('src', '');
+        $('#current_book_id').val('');
+        $('#view_full_details_btn').attr('href', '#');
     });
 });

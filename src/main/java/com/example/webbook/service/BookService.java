@@ -2,6 +2,7 @@ package com.example.webbook.service;
 
 import com.example.webbook.dto.AddBookForm;
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.dto.UpdateBookForm;
 import com.example.webbook.model.Author;
 import com.example.webbook.model.Category;
 import com.example.webbook.repository.AuthorRepository;
@@ -17,12 +18,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -58,6 +61,14 @@ public class BookService {
         }
 
         return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Get books by author ID
+    public List<BookInfo> getBooksByAuthorId(UUID authorId) {
+        List<Book> books = bookRepository.findByAuthorId(authorId);
+        return books.stream()
+                .map(this::convertToBookInfo)
+                .collect(Collectors.toList());
     }
 
     // Overloaded method for backward compatibility
@@ -155,11 +166,22 @@ public class BookService {
     }
 
     @Transactional
-    public Book updateBook(UUID id, AddBookForm form) throws IOException {
+    public Book updateBook(UUID id, UpdateBookForm form) throws IOException {
         Book book = getBookById(id);
         String oldImageUrl = book.getImage();
         String oldContentUrl = book.getBook_content();
         String oldTitle = book.getTitle();
+        boolean titleChanged = !oldTitle.equals(form.getTitle());
+
+        System.out.println("\n=== UPDATE BOOK OPERATION ===");
+        System.out.println("Book ID: " + id);
+        System.out.println("Old Title: " + oldTitle);
+        System.out.println("New Title: " + form.getTitle());
+        System.out.println("Title Changed: " + titleChanged);
+        System.out.println("Old Image URL: " + oldImageUrl);
+        System.out.println("Old Content URL: " + oldContentUrl);
+        System.out.println("New Image File: " + (form.getImageFile() != null && !form.getImageFile().isEmpty() ? "YES" : "NO"));
+        System.out.println("New Content File: " + (form.getContentFile() != null && !form.getContentFile().isEmpty() ? "YES" : "NO"));
 
         // Update basic fields
         book.setTitle(form.getTitle());
@@ -168,41 +190,112 @@ public class BookService {
         book.setPage(form.getPage());
         book.setPrice(form.getPrice());
 
-        // Update image if new one provided
+        // Handle image update
         if (form.getImageFile() != null && !form.getImageFile().isEmpty()) {
+            System.out.println("\n--- IMAGE UPDATE: New image uploaded ---");
+
+            // Delete old image FIRST if it exists
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                System.out.println("Deleting old image before upload...");
+                supabaseStorageService.deleteFile(oldImageUrl);
+                // Wait a bit to ensure deletion completes
+                try { Thread.sleep(500); } catch (InterruptedException e) {}
+            }
+
+            // Upload new image
+            System.out.println("Uploading new image...");
             String newImageUrl = supabaseStorageService.uploadBookImage(form.getImageFile(), form.getTitle());
             book.setImage(newImageUrl);
+            System.out.println("New Image URL: " + newImageUrl);
 
-            // Delete old image (only if title changed or it's a different file)
-            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
-                supabaseStorageService.deleteFile(oldImageUrl);
+        } else if (titleChanged && oldImageUrl != null && !oldImageUrl.isEmpty()) {
+            System.out.println("\n--- IMAGE UPDATE: Title changed, renaming image file ---");
+            try {
+                String oldFilename = extractFilenameFromUrl(oldImageUrl);
+                String extension = getFileExtension(oldFilename);
+
+                // Download the old file
+                byte[] imageData = supabaseStorageService.downloadFile(oldImageUrl);
+
+                if (imageData != null && imageData.length > 0) {
+                    // Delete old file FIRST
+                    System.out.println("Deleting old image before re-upload...");
+                    supabaseStorageService.deleteFile(oldImageUrl);
+                    try { Thread.sleep(500); } catch (InterruptedException e) {}
+
+                    // Re-upload with new filename
+                    String contentType = "image/" + extension.replace(".", "");
+                    String newImageUrl = supabaseStorageService.uploadBookImageFromBytes(
+                            imageData,
+                            form.getTitle(),
+                            extension,
+                            contentType
+                    );
+                    book.setImage(newImageUrl);
+                    System.out.println("New Image URL after rename: " + newImageUrl);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to rename image file: " + e.getMessage());
+                e.printStackTrace();
             }
-        } else if (!oldTitle.equals(form.getTitle()) && oldImageUrl != null) {
-            // Title changed but no new image - we might want to rename the file
-            // For now, keep the old URL
+        } else {
+            System.out.println("\n--- IMAGE UPDATE: No changes, keeping existing image ---");
         }
 
-        // Update PDF if new one provided
+        // Handle PDF content update
         if (form.getContentFile() != null && !form.getContentFile().isEmpty()) {
+            System.out.println("\n--- CONTENT UPDATE: New PDF uploaded ---");
+
+            // Delete old PDF FIRST if it exists
+            if (oldContentUrl != null && !oldContentUrl.isEmpty()) {
+                System.out.println("Deleting old PDF before upload...");
+                supabaseStorageService.deleteFile(oldContentUrl);
+                // Wait a bit to ensure deletion completes
+                try { Thread.sleep(500); } catch (InterruptedException e) {}
+            }
+
+            // Upload new PDF
+            System.out.println("Uploading new PDF...");
             String newContentUrl = supabaseStorageService.uploadBookContent(form.getContentFile(), form.getTitle());
             book.setBook_content(newContentUrl);
+            System.out.println("New Content URL: " + newContentUrl);
 
-            // Delete old PDF
-            if (oldContentUrl != null && !oldContentUrl.isEmpty()) {
-                supabaseStorageService.deleteFile(oldContentUrl);
+        } else if (titleChanged && oldContentUrl != null && !oldContentUrl.isEmpty()) {
+            System.out.println("\n--- CONTENT UPDATE: Title changed, renaming PDF file ---");
+            try {
+                // Download old PDF
+                byte[] pdfData = supabaseStorageService.downloadFile(oldContentUrl);
+
+                if (pdfData != null && pdfData.length > 0) {
+                    // Delete old file FIRST
+                    System.out.println("Deleting old PDF before re-upload...");
+                    supabaseStorageService.deleteFile(oldContentUrl);
+                    try { Thread.sleep(500); } catch (InterruptedException e) {}
+
+                    // Re-upload with new filename
+                    String newContentUrl = supabaseStorageService.uploadBookContentFromBytes(
+                            pdfData,
+                            form.getTitle()
+                    );
+                    book.setBook_content(newContentUrl);
+                    System.out.println("New Content URL after rename: " + newContentUrl);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to rename PDF file: " + e.getMessage());
+                e.printStackTrace();
             }
-        } else if (!oldTitle.equals(form.getTitle()) && oldContentUrl != null) {
-            // Title changed but no new content - we might want to rename the file
-            // For now, keep the old URL
+        } else {
+            System.out.println("\n--- CONTENT UPDATE: No changes, keeping existing PDF ---");
         }
 
-        // Update author and category
+        // Update author
         if (form.getAuthor() != null && !form.getAuthor().trim().isEmpty()) {
             Author author = authorRepository.findByName(form.getAuthor())
                     .orElseThrow(() -> new RuntimeException("Author not found: " + form.getAuthor()));
             book.setAuthor(author);
         }
 
+        // Update category
         if (form.getCategory_type() != null && !form.getCategory_type().trim().isEmpty()) {
             Long categoryId = Long.parseLong(form.getCategory_type());
             Category category = categoryRepository.findById(categoryId)
@@ -211,8 +304,35 @@ public class BookService {
         }
 
         book.setLast_updated(LocalDateTime.now());
-        return bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
+
+        System.out.println("\n✓ Book updated successfully in database");
+        System.out.println("Final Image URL: " + savedBook.getImage());
+        System.out.println("Final Content URL: " + savedBook.getBook_content());
+        System.out.println("=== END UPDATE BOOK OPERATION ===\n");
+
+        return savedBook;
     }
+
+    // Helper method to extract filename from URL
+    private String extractFilenameFromUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return "";
+        }
+        String[] parts = url.split("/");
+        String encodedFilename = parts[parts.length - 1];
+        // Decode URL encoding
+        return java.net.URLDecoder.decode(encodedFilename, StandardCharsets.UTF_8);
+    }
+
+    // Helper method to get file extension
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return ".jpg"; // default
+        }
+        return filename.substring(filename.lastIndexOf("."));
+    }
+
 
     @Transactional
     public void deleteBook(UUID id) {

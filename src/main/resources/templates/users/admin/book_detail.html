@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${book.title} + ' - Book Details'">Book Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .book-detail-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        .detail-value {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-button {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="wrapper d-flex align-items-stretch">
+    <div th:replace="~{fragments/admin_sidebar :: sidebar}"></div>
+
+    <!-- Page Content -->
+    <div id="content" class="p-4 p-md-5">
+        <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
+
+        <!-- Back Button -->
+        <div class="back-button">
+            <a th:href="@{/book/books}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Book List
+            </a>
+        </div>
+
+        <!-- Book Details Card -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-book-open me-2"></i>Book Details
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <!-- Book Image -->
+                    <div class="col-md-4 text-center mb-4">
+                        <img th:src="${book.image?.trim() ?: 'https://via.placeholder.com/300x400?text=No+Image'}"
+                             th:alt="${book.title}"
+                             class="book-detail-image"
+                             id="book_detail_image">
+                    </div>
+
+                    <!-- Book Information -->
+                    <div class="col-md-8">
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <div class="detail-label">Title</div>
+                            <h2 class="detail-value" th:text="${book.title}" id="book_detail_title">Book Title</h2>
+                        </div>
+
+                        <!-- Author -->
+                        <div class="mb-3">
+                            <div class="detail-label">Author</div>
+                            <div class="detail-value">
+                                <i class="fas fa-user-pen me-2 text-primary"></i>
+                                <span th:text="${book.author_name ?: 'Unknown'}" id="book_detail_author">Author Name</span>
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <div class="detail-label">Category</div>
+                            <div class="detail-value">
+                                <i class="fas fa-tag me-2 text-success"></i>
+                                <span th:text="${book.category_name ?: 'Uncategorized'}" id="book_detail_category">Category</span>
+                            </div>
+                        </div>
+
+                        <!-- Published Date -->
+                        <div class="mb-3" th:if="${book.published_date}">
+                            <div class="detail-label">Published Date</div>
+                            <div class="detail-value">
+                                <i class="fas fa-calendar me-2 text-info"></i>
+                                <span th:text="${book.published_date}" id="book_detail_published_date">2024-01-01</span>
+                            </div>
+                        </div>
+
+                        <!-- Pages and Price -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="detail-label">Pages</div>
+                                <div class="detail-value">
+                                    <i class="fas fa-file me-2 text-warning"></i>
+                                    <span th:text="${book.page ?: 'N/A'}" id="book_detail_page">300</span> pages
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-label">Price</div>
+                                <div class="detail-value">
+                                    <i class="fas fa-dollar-sign me-2 text-success"></i>
+                                    <span class="text-success fw-bold"
+                                          th:text="${book.price != null ? '$' + book.price : 'N/A'}"
+                                          id="book_detail_price">$29.99</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <div class="detail-label">Description</div>
+                            <div class="detail-value" style="white-space: pre-wrap;"
+                                 th:text="${book.description ?: 'No description available'}"
+                                 id="book_detail_description">
+                                Book description goes here...
+                            </div>
+                        </div>
+
+                        <!-- Book Content Link -->
+                        <div class="mb-3" th:if="${book.book_content}">
+                            <div class="detail-label">Book Content</div>
+                            <div class="detail-value">
+                                <a th:href="${book.book_content}"
+                                   target="_blank"
+                                   class="btn btn-outline-primary"
+                                   id="book_detail_content_link">
+                                    <i class="fas fa-file-pdf me-2"></i>View PDF Content
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Last Updated -->
+                        <div class="mb-3" th:if="${book.last_updated}">
+                            <div class="detail-label">Last Updated</div>
+                            <div class="detail-value">
+                                <i class="fas fa-clock me-2 text-muted"></i>
+                                <span th:text="${book.last_updated}">2024-12-19 01:30 PM</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-4">
+                            <a th:href="@{/book/books}" class="btn btn-secondary me-2">
+                                <i class="fas fa-list me-2"></i>Back to List
+                            </a>
+                            <button type="button"
+                                    class="btn btn-warning me-2 edit-book-btn"
+                                    data-toggle="modal"
+                                    data-target="#updateBookForm"
+                                    th:attr="data-book-id=${book.book_id},
+                                             data-title=${book.title},
+                                             data-description=${book.description ?: ''},
+                                             data-published-date=${book.published_date ?: ''},
+                                             data-page=${book.page ?: ''},
+                                             data-price=${book.price},
+                                             data-image=${book.image ?: ''},
+                                             data-book-content=${book.book_content ?: ''},
+                                             data-author-name=${book.author_name ?: ''},
+                                             data-category-id=${book.category_id ?: ''}">
+                                <i class="fas fa-edit me-2"></i>Edit Book
+                            </button>
+                            <button type="button"
+                                    class="btn btn-danger delete-book-btn"
+                                    data-toggle="modal"
+                                    data-target="#deleteBookModal"
+                                    th:attr="data-book-id=${book.book_id},
+                                             data-book-title=${book.title}">
+                                <i class="fas fa-trash me-2"></i>Delete Book
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Update and Delete Modals -->
+<div th:replace="~{modals/admin/update_book :: updateBookModal}"></div>
+<div th:replace="~{modals/admin/delete_book :: deleteBookModal}"></div>
+<div th:replace="~{modals/admin/logout :: logoutModal}"></div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/popper.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/logout.js}"></script>
+<script th:src="@{/js/admin/update_book_form.js}"></script>
+<script th:src="@{/js/admin/delete_book_detail.js}"></script>
+
+</body>
+</html>

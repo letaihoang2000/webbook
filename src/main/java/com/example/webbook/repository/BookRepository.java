@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -23,6 +24,10 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
     // Search by author name
     @Query("SELECT b FROM Book b JOIN b.author a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :authorName, '%'))")
     Page<Book> findByAuthorNameContainingIgnoreCase(@Param("authorName") String authorName, Pageable pageable);
+
+    // Find books by author ID
+    @Query("SELECT b FROM Book b WHERE b.author.id = :authorId ORDER BY b.last_updated DESC")
+    List<Book> findByAuthorId(@Param("authorId") UUID authorId);
 
     // Count methods for pagination info
     @Query("SELECT COUNT(b) FROM Book b")

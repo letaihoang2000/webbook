@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="authorBooksModal">
+    <div class="modal fade" id="authorBooksModal" tabindex="-1" role="dialog"
+         aria-labelledby="authorBooksModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="authorBooksModalTitle">
+                        <i class="fas fa-book me-2"></i>Books by <span id="modalAuthorName"></span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="booksLoadingSpinner" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading books...</p>
+                    </div>
+
+                    <div id="booksErrorMessage" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="booksErrorText"></span>
+                    </div>
+
+                    <div id="booksListContainer">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th style="width: 100px;">Cover</th>
+                                    <th>Title</th>
+                                    <th style="width: 120px;">Published</th>
+                                    <th style="width: 100px;">Pages</th>
+                                    <th style="width: 100px;">Price</th>
+                                    <th style="width: 100px;" class="text-center">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody id="authorBooksList">
+                                <!-- Books will be loaded here via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="noBooksMessage" class="text-center py-5" style="display: none;">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No books found</h5>
+                            <p class="text-muted">This author hasn't published any books yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
