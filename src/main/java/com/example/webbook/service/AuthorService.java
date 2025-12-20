@@ -2,6 +2,7 @@ package com.example.webbook.service;
 
 import com.example.webbook.dto.AddAuthorForm;
 import com.example.webbook.dto.AuthorInfo;
+import com.example.webbook.dto.UpdateAuthorForm;
 import com.example.webbook.model.Author;
 import com.example.webbook.repository.AuthorRepository;
 import jakarta.transaction.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -86,9 +88,18 @@ public class AuthorService {
 
     // Update author
     @Transactional
-    public Author updateAuthor(UUID id, AddAuthorForm form) throws IOException {
+    public Author updateAuthor(UUID id, UpdateAuthorForm form) throws IOException {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        System.out.println("\n=== UPDATE AUTHOR OPERATION ===");
+        System.out.println("Author ID: " + id);
+        System.out.println("Old Name: " + author.getName());
+        System.out.println("New Name: " + form.getName());
+
+        String oldImageUrl = author.getImage();
+        String oldName = author.getName();
+        boolean nameChanged = !oldName.equals(form.getName());
 
         // Validate name
         if (form.getName() == null || form.getName().trim().isEmpty()) {
@@ -96,42 +107,83 @@ public class AuthorService {
         }
 
         // Check if name is being changed and if new name already exists
-        if (!author.getName().equals(form.getName())) {
+        if (nameChanged) {
             if (authorRepository.findByName(form.getName()).isPresent()) {
                 throw new IllegalArgumentException("Author with name '" + form.getName() + "' already exists");
             }
-
-            // If name changed and has image, need to re-upload with new name
-            if (form.getImage_file() == null && author.getImage() != null && !author.getImage().isEmpty()) {
-                // Delete old image
-                supabaseStorageService.deleteFile(author.getImage());
-
-                // Note: Can't re-upload existing image automatically since we don't have the file
-                // User should upload new image or leave it blank
-                author.setImage(null);
-            }
-
-            author.setName(form.getName());
         }
 
+        // Update name
+        author.setName(form.getName());
         author.setDescription(form.getDescription());
 
-        // Update image if new file provided
+        // Handle image update
         if (form.getImage_file() != null && !form.getImage_file().isEmpty()) {
-            // Delete old image if exists
-            if (author.getImage() != null && !author.getImage().isEmpty()) {
-                supabaseStorageService.deleteFile(author.getImage());
+            System.out.println("--- IMAGE UPDATE: New image uploaded ---");
+
+            // Delete old image FIRST if exists
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                System.out.println("Deleting old image...");
+                supabaseStorageService.deleteFile(oldImageUrl);
+                try { Thread.sleep(500); } catch (InterruptedException e) {}
             }
 
             // Upload new image
-            String imageUrl = supabaseStorageService.uploadAuthorImage(
+            System.out.println("Uploading new image...");
+            String newImageUrl = supabaseStorageService.uploadAuthorImage(
                     form.getImage_file(),
                     form.getName()
             );
-            author.setImage(imageUrl);
+            author.setImage(newImageUrl);
+            System.out.println("New Image URL: " + newImageUrl);
+
+        } else if (nameChanged && oldImageUrl != null && !oldImageUrl.isEmpty()) {
+            System.out.println("--- IMAGE UPDATE: Name changed, renaming image ---");
+            try {
+                // Extract extension from old filename
+                String oldFilename = extractFilenameFromUrl(oldImageUrl);
+                String extension = getFileExtension(oldFilename);
+
+                // Download old image
+                byte[] imageData = supabaseStorageService.downloadFile(oldImageUrl);
+
+                if (imageData != null && imageData.length > 0) {
+                    // Delete old file
+                    supabaseStorageService.deleteFile(oldImageUrl);
+                    try { Thread.sleep(500); } catch (InterruptedException e) {}
+
+                    // Re-upload with new name
+                    String contentType = "image/" + extension.replace(".", "");
+                    String newImageUrl = supabaseStorageService.uploadAuthorImageFromBytes(
+                            imageData,
+                            form.getName(),
+                            extension,
+                            contentType
+                    );
+                    author.setImage(newImageUrl);
+                    System.out.println("Image renamed successfully");
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to rename image: " + e.getMessage());
+                // Keep old image URL if rename fails
+            }
         }
 
+        System.out.println("=== END UPDATE AUTHOR OPERATION ===\n");
         return authorRepository.save(author);
+    }
+
+    // Helper methods
+    private String extractFilenameFromUrl(String url) {
+        if (url == null || url.isEmpty()) return "";
+        String[] parts = url.split("/");
+        String encodedFilename = parts[parts.length - 1];
+        return java.net.URLDecoder.decode(encodedFilename, StandardCharsets.UTF_8);
+    }
+
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return ".jpg";
+        return filename.substring(filename.lastIndexOf("."));
     }
 
     // Delete author

@@ -166,6 +166,22 @@ public class SupabaseStorageService {
     }
 
     /**
+     * Upload author image from byte array (for renaming operations)
+     */
+    public String uploadAuthorImageFromBytes(byte[] fileData, String authorName, String extension, String contentType) throws IOException {
+        if (fileData == null || fileData.length == 0) {
+            return null;
+        }
+
+        String sanitizedName = sanitizeFilename(authorName);
+        String filename = sanitizedName + extension;
+        String fullPath = authorFolder + "/" + filename;
+
+        uploadToSupabase(fullPath, fileData, contentType);
+        return getPublicUrl(fullPath);
+    }
+
+    /**
      * Sanitize filename - remove or replace special characters
      * Keeps letters, numbers, spaces, hyphens, and apostrophes
      */

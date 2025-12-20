@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="col-auto ms-auto">
-                            <button type="button" class="btn btn-light btn-sm">
+                            <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addAuthorForm">
                                 <i class="fas fa-plus me-1"></i> Add Author
                             </button>
                         </div>
@@ -135,7 +135,7 @@
                         <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">No authors found</h5>
                         <p class="text-muted">Click "Add Author" to create a new author</p>
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAuthorForm">
                             <i class="fas fa-plus me-1"></i>Add Author
                         </button>
                     </div>
@@ -217,8 +217,11 @@
     </div>
 </div>
 
+<div th:replace="~{modals/admin/add_author :: addAuthorModal}"></div>
+<div th:replace="~{modals/admin/update_author :: updateAuthorModal}"></div>
+<div th:replace="~{modals/admin/view_author :: viewAuthorModal}"></div>
+<div th:replace="~{modals/admin/delete_author :: deleteAuthorModal}"></div>
 <div th:replace="~{modals/admin/author_books :: authorBooksModal}"></div>
-<!-- Modals will be added later -->
 <div th:replace="~{modals/admin/logout :: logoutModal}"></div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
@@ -227,6 +230,10 @@
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/logout.js}"></script>
 <script th:src="@{/js/admin/author_index.js}"></script>
+<script th:src="@{/js/admin/add_author_form.js}"></script>
+<script th:src="@{/js/admin/update_author_form.js}"></script>
+<script th:src="@{/js/admin/view_author.js}"></script>
+<script th:src="@{/js/admin/delete_author.js}"></script>
 <script th:src="@{/js/admin/author_books.js}"></script>
 
 </body>

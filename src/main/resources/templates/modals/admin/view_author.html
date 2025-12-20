@@ -1,0 +1,74 @@
+<div th:fragment="viewAuthorModal" xmlns:th="http://www.thymeleaf.org">
+    <div class="modal fade" id="viewAuthorModal" tabindex="-1" role="dialog"
+         aria-labelledby="viewAuthorModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="viewAuthorModalTitle">
+                        <i class="fas fa-user-tie me-2"></i>Author Details
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Author Image -->
+                        <div class="col-md-4 text-center mb-4">
+                            <img id="view_author_image"
+                                 src=""
+                                 alt="Author Photo"
+                                 class="img-fluid rounded shadow"
+                                 style="max-width: 100%; max-height: 350px; object-fit: cover;">
+                        </div>
+
+                        <!-- Author Information -->
+                        <div class="col-md-8">
+                            <!-- Name -->
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">
+                                    <i class="fas fa-user me-2"></i>Name
+                                </label>
+                                <h3 id="view_author_name" class="mb-0">Author Name</h3>
+                            </div>
+
+                            <!-- Books Count -->
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">
+                                    <i class="fas fa-book me-2"></i>Published Books
+                                </label>
+                                <div>
+                                    <span id="view_author_books" class="badge bg-primary fs-5">0 book(s)</span>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-bold">
+                                    <i class="fas fa-align-left me-2"></i>Biography/Description
+                                </label>
+                                <div id="view_author_description"
+                                     class="p-3 bg-light rounded"
+                                     style="white-space: pre-wrap; min-height: 100px;">
+                                    No description available
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
+                    <button type="button"
+                            class="btn btn-warning edit-from-view-btn"
+                            id="editAuthorFromView">
+                        <i class="fas fa-edit me-1"></i>Edit Author
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

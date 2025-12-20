@@ -1,0 +1,112 @@
+<div th:fragment="updateAuthorModal" xmlns:th="http://www.thymeleaf.org">
+    <div class="modal fade" id="updateAuthorForm" tabindex="-1" role="dialog"
+         aria-labelledby="updateAuthorModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <form id="updateAuthorFormElement" enctype="multipart/form-data">
+                    <input type="hidden" id="update_author_id" name="author_id">
+
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title" id="updateAuthorModalTitle">
+                            <i class="fas fa-user-edit me-2"></i>Update Author
+                        </h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Author Name -->
+                        <div class="mb-3">
+                            <label class="form-label" for="update_author_name">
+                                <i class="fas fa-user me-1"></i>Author Name *
+                            </label>
+                            <input type="text"
+                                   id="update_author_name"
+                                   name="name"
+                                   class="form-control"
+                                   placeholder="Enter author name"
+                                   required />
+                            <small class="text-muted">Full name of the author</small>
+                        </div>
+
+                        <!-- Current Author Image -->
+                        <div class="mb-3">
+                            <label class="form-label">Current Photo</label>
+                            <div id="currentAuthorImageContainer" style="display: none;">
+                                <div class="card">
+                                    <img id="currentAuthorImage"
+                                         src=""
+                                         alt="Current Author Photo"
+                                         style="max-width: 100%; max-height: 250px; object-fit: contain;"
+                                         class="card-img-top p-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-check-circle text-success me-1"></i>
+                                            Current photo will be kept if you don't upload a new one
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="noCurrentAuthorImage" style="display: none;">
+                                <div class="alert alert-info py-2 mb-0">
+                                    <small><i class="fas fa-info-circle me-1"></i>No current photo</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Author Image -->
+                        <div class="mb-3">
+                            <label class="form-label" for="update_author_image">
+                                <i class="fas fa-upload me-1"></i>Upload New Photo (optional)
+                            </label>
+                            <input type="file"
+                                   id="update_author_image"
+                                   name="image_file"
+                                   class="form-control"
+                                   accept="image/*" />
+                            <small class="text-muted">Leave empty to keep current photo. Max 5MB</small>
+
+                            <!-- New Image Preview -->
+                            <div id="updateAuthorImagePreview" class="mt-3" style="display: none;">
+                                <div class="card">
+                                    <img src=""
+                                         alt="New Preview"
+                                         style="max-width: 100%; max-height: 250px; object-fit: contain;"
+                                         class="card-img-top p-3">
+                                    <div class="card-body py-2">
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>New image selected
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label" for="update_author_description">
+                                <i class="fas fa-align-left me-1"></i>Biography/Description
+                            </label>
+                            <textarea id="update_author_description"
+                                      name="description"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Enter author biography or description..."></textarea>
+                            <small class="text-muted">Brief information about the author</small>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-warning text-white">
+                            <i class="fas fa-save me-1"></i>Update Author
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

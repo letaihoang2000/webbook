@@ -15,13 +15,4 @@ $(document).ready(function() {
             }
         }, 500);
     });
-
-    // Button placeholders (will be implemented later with modals)
-    $('.view-author-btn, .edit-author-btn, .delete-author-btn').on('click', function() {
-        alert('Modal functionality will be added later');
-    });
-
-    $('button:contains("Add Author")').on('click', function() {
-        alert('Add Author modal will be added later');
-    });
 });

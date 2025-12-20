@@ -1,0 +1,81 @@
+<div th:fragment="deleteAuthorModal" xmlns:th="http://www.thymeleaf.org">
+    <div class="modal fade" id="deleteAuthorModal" tabindex="-1" role="dialog"
+         aria-labelledby="deleteAuthorModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAuthorModalTitle">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="delete_author_id">
+                    <input type="hidden" id="delete_author_books_count">
+
+                    <div class="text-center mb-3">
+                        <i class="fas fa-user-slash fa-4x text-danger mb-3"></i>
+                        <h5>Are you sure you want to delete this author?</h5>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>This action cannot be undone!</strong>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Author Details:</h6>
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <img id="delete_author_image"
+                                         src=""
+                                         alt="Author Photo"
+                                         class="img-fluid rounded"
+                                         style="max-height: 120px; object-fit: cover;">
+                                </div>
+                                <div class="col-8">
+                                    <p class="mb-2">
+                                        <strong>Name:</strong><br>
+                                        <span id="delete_author_name" class="text-primary fs-5"></span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Books Published:</strong><br>
+                                        <span id="delete_author_books_display" class="badge bg-primary">0 book(s)</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning if author has books -->
+                    <div id="hasBooks Warning" class="alert alert-danger mt-3" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Cannot delete this author!</strong><br>
+                        <small>This author has books associated. Please remove or reassign the books first.</small>
+                    </div>
+
+                    <!-- Confirmation if no books -->
+                    <div id="noBooksWarning" class="alert alert-info mt-3" style="display: none;">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            This author will be permanently removed from the system.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteAuthorBtn">
+                        <i class="fas fa-trash-alt me-1"></i>Delete Author
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

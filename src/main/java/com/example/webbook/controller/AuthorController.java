@@ -3,6 +3,7 @@ package com.example.webbook.controller;
 import com.example.webbook.dto.AddAuthorForm;
 import com.example.webbook.dto.AuthorInfo;
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.dto.UpdateAuthorForm;
 import com.example.webbook.model.Author;
 import com.example.webbook.service.AuthorService;
 import com.example.webbook.service.BookService;
@@ -115,17 +116,17 @@ public class AuthorController {
         }
     }
 
-    // Update author
+    // Update author - Use UpdateAuthorForm
     @PostMapping("/update/{id}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateAuthor(
             @PathVariable("id") String id,
-            @ModelAttribute AddAuthorForm addAuthorForm) {
+            @ModelAttribute UpdateAuthorForm updateAuthorForm) {  // Changed from AddAuthorForm
         Map<String, Object> response = new HashMap<>();
 
         try {
             UUID authorId = UUID.fromString(id);
-            Author updatedAuthor = authorService.updateAuthor(authorId, addAuthorForm);
+            Author updatedAuthor = authorService.updateAuthor(authorId, updateAuthorForm);
 
             response.put("success", true);
             response.put("message", "Author updated successfully!");
@@ -151,6 +152,7 @@ public class AuthorController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
 
     // Delete author
     @PostMapping("/delete/{id}")
