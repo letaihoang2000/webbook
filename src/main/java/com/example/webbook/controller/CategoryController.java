@@ -20,33 +20,26 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    // Hiển thị danh sách categories
     @GetMapping
     public String listCategories(Model model) {
-
-        // Danh sách category
         model.addAttribute("categories", categoryService.getAllCategories());
 
-        // QUAN TRỌNG: đảm bảo luôn có categoryForm trong model
         if (!model.containsAttribute("categoryForm")) {
             model.addAttribute("categoryForm", new AddCategoryForm());
         }
 
-        return "users/admin/category_index"; // Trả về view list.html
+        return "users/admin/category_index";
     }
-
 
     @PostMapping("/add")
     public String addCategory(@ModelAttribute("categoryForm") AddCategoryForm form,
                               RedirectAttributes redirectAttributes) {
         categoryService.addCategory(form);
         redirectAttributes.addFlashAttribute("message", "Thêm category thành công!");
-        // để modal Add tiếp tục dùng được khi reload
         redirectAttributes.addFlashAttribute("categoryForm", new AddCategoryForm());
         return "redirect:/category";
     }
 
-    // Hiển thị form sửa category
     @PostMapping("/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateCategoryAjax(
@@ -77,11 +70,23 @@ public class CategoryController {
         }
     }
 
-    // Xóa category
-    @GetMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        categoryService.deleteCategory(id);
-        redirectAttributes.addFlashAttribute("message", "Xóa category thành công!");
-        return "redirect:/category";
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteCategory(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            categoryService.deleteCategory(id);
+
+            response.put("success", true);
+            response.put("message", "Category deleted successfully!");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage() != null ? e.getMessage()
+                    : "An unexpected error occurred while deleting the category.");
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

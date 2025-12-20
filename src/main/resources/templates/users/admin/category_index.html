@@ -1,124 +1,133 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>View Categories</title>
-
-  <!-- CSS giống trang Users -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/admin/category_index.css}">
-  <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>View Categories</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/category_index.css}">
 </head>
 <body class="bg-light">
 
 <div class="wrapper d-flex align-items-stretch">
-  <!-- Sidebar -->
-  <div th:replace="~{fragments/admin_sidebar :: sidebar}"></div>
+    <div th:replace="~{fragments/admin_sidebar :: sidebar}"></div>
 
-  <!-- Page Content -->
-  <div id="content" class="p-4 p-md-5">
-    <!-- Navbar -->
-    <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
+    <!-- Page Content -->
+    <div id="content" class="p-4 p-md-5">
+        <div th:replace="~{fragments/admin_navbar :: navbar}"></div>
 
-    <h2 class="mb-4">Categories</h2>
+        <h2 class="mb-4">Categories</h2>
+        <div class="container mt-4">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <div class="row align-items-center g-2">
+                        <div class="col-auto">
+                            <h4 class="mb-0"><i class="fas fa-list me-2"></i>View Categories</h4>
+                        </div>
 
-    <div class="container mt-4">
-      <div class="card shadow">
-        <!-- Header -->
-        <div class="card-header text-white">
-          <div class="row align-items-center">
-            <div class="col">
-              <h4 class="mb-0">
-                <i class="fas fa-list me-2"></i>Category List
-              </h4>
+                        <div class="col-auto ms-auto">
+                            <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addCategoryForm">
+                                <i class="fas fa-plus me-1"></i> Create Category
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Pagination Info -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom" th:if="${!#lists.isEmpty(categories)}">
+                        <div class="pagination-info">
+                            Total: <strong th:text="${#lists.size(categories)}">0</strong> categories
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(categories)}">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th style="width: 15%">ID</th>
+                                <th>Category Name</th>
+                                <th class="text-center" style="width: 20%">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="category : ${categories}">
+                                <td th:text="${category.id}"></td>
+                                <td>
+                                    <strong th:text="${category.name}"></strong>
+                                </td>
+                                <td class="text-center table-actions">
+                                    <div class="btn-group" role="group">
+                                        <button type="button"
+                                                class="btn btn-outline-warning btn-sm edit-category-btn"
+                                                data-toggle="modal"
+                                                data-target="#updateCategoryForm"
+                                                title="Edit"
+                                                th:attr="data-id=${category.id}, data-name=${category.name}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-outline-danger btn-sm delete-category-btn"
+                                                title="Delete"
+                                                th:attr="data-id=${category.id}, data-name=${category.name}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div th:if="${#lists.isEmpty(categories)}" class="text-center py-5">
+                        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No categories found</h5>
+                        <p class="text-muted">Click "Create Category" to add a new category</p>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryForm">
+                            <i class="fas fa-plus me-1"></i>Add Category
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-light" th:if="${!#lists.isEmpty(categories)}">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small class="text-muted">
+                                Total: <strong th:text="${#lists.size(categories)}">0</strong> categories
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>Last updated:
+                                <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy hh:mm a')}"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-              <!-- NÚT MỞ MODAL (không dùng href nữa) -->
-              <button type="button"
-                      class="btn btn-light btn-sm"
-                      data-toggle="modal"
-                      data-target="#addCategoryForm">
-                <i class="fas fa-plus me-1"></i> Create Category
-              </button>
-            </div>
-          </div>
         </div>
-
-        <!-- Message -->
-        <div class="card-body pb-0" th:if="${message}">
-          <div class="alert alert-info mb-3" th:text="${message}"></div>
-        </div>
-
-        <!-- Table -->
-        <div class="card-body p-0" th:if="${!#lists.isEmpty(categories)}">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-              <tr>
-                <th style="width: 10%">ID</th>
-                <th>Tên Category</th>
-                <th class="text-center" style="width: 20%">Hành động</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr th:each="category : ${categories}">
-                <td th:text="${category.id}"></td>
-                <td th:text="${category.name}"></td>
-                <td class="text-center">
-                  <div class="btn-group" role="group">
-                    <button type="button"
-                            class="btn btn-outline-warning btn-sm edit-category-btn"
-                            data-toggle="modal"
-                            data-target="#updateCategoryForm"
-                            th:attr="data-id=${category.id}, data-name=${category.name}">
-                      <i class="fas fa-edit"></i>
-                    </button>
-
-                    <a class="btn btn-outline-danger btn-sm"
-                       th:href="@{/category/delete/{id}(id=${category.id})}"
-                       onclick="return confirm('Bạn có chắc muốn xóa category này không?')"
-                       title="Xóa">
-                      <i class="fas fa-trash"></i>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Empty state -->
-        <div class="card-body text-center py-5" th:if="${#lists.isEmpty(categories)}">
-          <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">Hiện tại chưa có category nào</h5>
-          <p class="text-muted">Nhấn "Create Category" để thêm category mới.</p>
-          <button type="button"
-                  class="btn btn-primary btn-sm"
-                  data-toggle="modal"
-                  data-target="#addCategoryForm">
-            <i class="fas fa-plus me-1"></i> Create Category
-          </button>
-        </div>
-
-      </div>
     </div>
-  </div>
 </div>
 
-<!-- MODAL ADD CATEGORY -->
+<!-- Modals -->
 <div th:replace="~{modals/admin/add_category :: addCategoryModal}"></div>
 <div th:replace="~{modals/admin/update_category :: updateCategoryModal}"></div>
+<div th:replace="~{modals/admin/delete_category :: deleteCategoryModal}"></div>
+<div th:replace="~{modals/admin/logout :: logoutModal}"></div>
 
-<!-- JS giống trang Users -->
-<script th:src="@{/js/admin/update_category_form.js}"></script>
 <script th:src="@{/js/jquery.min.js}"></script>
 <script th:src="@{/js/popper.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/logout.js}"></script>
+<script th:src="@{/js/admin/update_category_form.js}"></script>
+<script th:src="@{/js/admin/delete_category.js}"></script>
 
 </body>
 </html>
