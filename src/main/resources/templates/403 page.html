@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/403 page.css}">
+    <title>Access Denied - 403</title>
+</head>
+<body>
+<div class="error-container">
+    <div class="error-content">
+        <!-- Animated Lock Icon -->
+        <div class="icon-wrapper">
+            <div class="lock-circle">
+                <i class="fa fa-lock"></i>
+            </div>
+        </div>
+
+        <!-- Error Code -->
+        <h1 class="error-code">403</h1>
+
+        <!-- Error Message -->
+        <h2 class="error-title">Access Denied</h2>
+        <p class="error-description">
+            Sorry, you don't have permission to access this page.
+            <br>
+            This area is restricted to administrators only.
+        </p>
+
+        <!-- User Info -->
+        <div class="user-info" th:if="${#authentication.principal != 'anonymousUser'}">
+            <p>
+                <i class="fa fa-user"></i>
+                Logged in as: <strong th:text="${#authentication.principal.fullName}">User Name</strong>
+            </p>
+            <p>
+                <i class="fa fa-id-badge"></i>
+                Role: <strong th:text="${#authentication.principal.roleName}">USER</strong>
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="btn btn-back">
+                <i class="fa fa-arrow-left"></i> Go Back
+            </a>
+            <a th:href="@{/customer/home}" class="btn btn-home">
+                <i class="fa fa-home"></i> Go to Home
+            </a>
+        </div>
+
+        <!-- Additional Help -->
+        <div class="help-text">
+            <p>
+                <i class="fa fa-question-circle"></i>
+                Need admin access? Please contact your system administrator.
+            </p>
+        </div>
+    </div>
+
+    <!-- Decorative Background Elements -->
+    <div class="bg-decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+</div>
+</body>
+</html>

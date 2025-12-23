@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/register.css}">
+    <title>Register</title>
+</head>
+<body>
+<div class="overlay">
+    <form th:action="@{/register}" th:object="${userRegister}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="con">
+            <header class="head-form">
+                <h2>Sign Up</h2>
+                <p>Create your account to get started</p>
+            </header>
+
+            <!-- Error Messages -->
+            <div th:if="${emailError}" class="alert alert-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                <span th:text="${emailError}"></span>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Validation Errors -->
+            <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                <span>Please correct the errors below</span>
+            </div>
+
+            <br>
+            <div class="field-set">
+                <!-- First Name -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    <input class="form-input"
+                           type="text"
+                           th:field="*{first_name}"
+                           placeholder="First Name"
+                           required>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('first_name')}" th:errors="*{first_name}"></span>
+
+                <!-- Last Name -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    <input class="form-input"
+                           type="text"
+                           th:field="*{last_name}"
+                           placeholder="Last Name"
+                           required>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('last_name')}" th:errors="*{last_name}"></span>
+
+                <!-- Email -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-envelope"></i>
+                    </span>
+                    <input class="form-input"
+                           id="txt-input"
+                           type="email"
+                           th:field="*{email}"
+                           placeholder="Email"
+                           required>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+                <!-- Mobile -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-phone"></i>
+                    </span>
+                    <input class="form-input"
+                           type="tel"
+                           th:field="*{mobile}"
+                           placeholder="Mobile Number"
+                           required>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('mobile')}" th:errors="*{mobile}"></span>
+
+                <!-- Address -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-map-marker"></i>
+                    </span>
+                    <input class="form-input"
+                           type="text"
+                           th:field="*{address}"
+                           placeholder="Address"
+                           required>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-key"></i>
+                    </span>
+                    <input class="form-input"
+                           type="password"
+                           placeholder="Password"
+                           id="pwd"
+                           th:field="*{password}"
+                           required>
+                    <i class="fa fa-eye" id="eye"></i>
+                </div>
+                <span class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <span class="input-item">
+                        <i class="fa fa-key"></i>
+                    </span>
+                    <input class="form-input"
+                           type="password"
+                           placeholder="Confirm Password"
+                           id="confirm-pwd"
+                           name="confirmPassword"
+                           required>
+                    <i class="fa fa-eye" id="eye-confirm"></i>
+                </div>
+                <span class="error-text" id="confirm-password-error" style="display: none;">Passwords do not match</span>
+
+                <!-- Avatar Upload -->
+                <div class="input-group file-input-group">
+                    <span class="input-item">
+                        <i class="fa fa-image"></i>
+                    </span>
+                    <label for="avatar" class="file-label">
+                        <span id="file-name">Choose Avatar (Optional)</span>
+                    </label>
+                    <input type="file"
+                           id="avatar"
+                           name="avatar"
+                           accept="image/*"
+                           class="file-input"
+                           style="display: none;">
+                </div>
+                <div id="image-preview" style="display: none; margin: 10px 0; text-align: center;">
+                    <img id="preview-img" src="" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 50%; border: 3px solid #B8F2E6;">
+                </div>
+
+                <button type="submit" class="log-in">Sign Up</button>
+            </div>
+
+            <div class="other">
+                <span style="color: #333; font-size: 14px;">Already have an account?</span>
+                <a href="/login" class="btn submits sign-in">
+                    Log In
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+<script th:src="@{/js/register.js}"></script>
+</body>
+</html>

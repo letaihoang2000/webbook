@@ -29,6 +29,12 @@
                 <span>You have been logged out successfully.</span>
             </div>
 
+            <!-- Registration Success Message -->
+            <div th:if="${param.registered}" class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                <span>Registration successful! Please login with your credentials.</span>
+            </div>
+
             <br>
             <div class="field-set">
                 <span class="input-item">
@@ -66,13 +72,9 @@
                 </div>
 
                 <button type="submit" class="log-in">Log In</button>
-            </div>
-
-            <div class="other">
-                <button type="button" class="btn submits frgt-pass">Forgot Password</button>
-                <button type="button" class="btn submits sign-up">Sign Up
+                <a href="/register" class="btn sign-up" style="text-decoration: none;">Sign Up
                     <i class="fa fa-user-plus" aria-hidden="true"></i>
-                </button>
+                </a>
             </div>
         </div>
     </form>

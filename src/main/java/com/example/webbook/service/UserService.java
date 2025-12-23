@@ -3,6 +3,7 @@ package com.example.webbook.service;
 import com.example.webbook.dto.AddUserForm;
 import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.dto.UserInfo;
+import com.example.webbook.dto.UserRegister;
 import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.Role;
 import com.example.webbook.repository.RoleRepository;
@@ -113,6 +114,53 @@ public class UserService {
             userInfo.setRole_name(user.getRole().getRoleName());
         }
         return userInfo;
+    }
+
+    public User registerUser(UserRegister userRegister) {
+        // Check if email already exists
+        if (userRepository.existsByEmail(userRegister.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        Role userRole = roleRepository.findByRoleName("USER");
+        if (userRole == null) {
+            throw new RuntimeException("User role not found in the system. Please contact administrator.");
+        }
+
+        try {
+            User user = new User();
+            user.setId(UUID.randomUUID());
+
+            // Handle image upload from UserRegister's avatar field
+            MultipartFile avatarFile = userRegister.getAvatar();
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                try {
+                    String imageUrl = imageUploadService.uploadImage(avatarFile, user.getId());
+                    user.setImage(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid image file: " + e.getMessage());
+                }
+            }
+
+            user.setFirst_name(userRegister.getFirst_name());
+            user.setLast_name(userRegister.getLast_name());
+            user.setEmail(userRegister.getEmail());
+            user.setMobile(userRegister.getMobile());
+            user.setAddress(userRegister.getAddress());
+            user.setPassword(passwordEncoder.encode(userRegister.getPassword()));
+
+            user.setRole(userRole);
+
+            // Set timestamps
+            user.setCreated_at(LocalDateTime.now());
+            user.setLast_updated(LocalDateTime.now());
+
+            return userRepository.save(user);
+        } catch(Exception e){
+            throw new RuntimeException("Failed to register user: " + e.getMessage());
+        }
     }
 
     public User createUser(AddUserForm addUserForm) {

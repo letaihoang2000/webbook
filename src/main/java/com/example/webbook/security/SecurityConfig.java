@@ -37,10 +37,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // Public resources
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/webjars/**").permitAll()
-                        .requestMatchers("/login", "/register", "/").permitAll()
+                        .requestMatchers("/login", "/register", "/","/403").permitAll()
 
                         // Admin only access
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/category/**").hasRole("ADMIN")
+                        .requestMatchers("/author/**").hasRole("ADMIN")
 
                         // Customer access (both USER and ADMIN can access customer pages)
                         .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
@@ -75,6 +77,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1) // Allow only one session per user
                         .maxSessionsPreventsLogin(false) // Allow new login to invalidate old session
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/403") // Custom 403 error page
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf

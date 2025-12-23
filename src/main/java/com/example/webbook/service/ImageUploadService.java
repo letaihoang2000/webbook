@@ -40,10 +40,9 @@ public class ImageUploadService {
         }
 
         try {
-            // Method 2: Using separate folder parameter (Cloudinary recommended)
             Map<String, Object> uploadOptions = ObjectUtils.asMap(
                     "folder", "webbook/user_avatars",           // Destination folder
-                    "public_id", imageId.toString(),            // Just the filename/ID
+                    "public_id", imageId.toString(),            // Just the filename
                     "resource_type", "image",
                     "transformation", new Transformation()
                             .width(300).height(300)
@@ -89,8 +88,6 @@ public class ImageUploadService {
 
     private String extractPublicIdFromUrl(String url) {
         // Extract public ID from Cloudinary URL
-        // Example: https://res.cloudinary.com/demo/image/upload/v1234567890/webbook/user_avatars/uuid.jpg
-        // The public_id for Method 2 is: "webbook/user_avatars/uuid"
         try {
             String[] parts = url.split("/upload/");
             if (parts.length > 1) {
