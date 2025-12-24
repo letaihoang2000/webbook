@@ -8,12 +8,10 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    flex-direction: column;
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -23,6 +21,11 @@ body {
     width: 100%;
     max-width: 600px;
     padding: 20px;
+    margin: 50px auto;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .error-content {

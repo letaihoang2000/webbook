@@ -1,19 +1,29 @@
 package com.example.webbook.security;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -31,18 +41,36 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Special handler for Remember Me authentication
+     * This handler does NOT redirect - it lets Spring Security continue with the original request
+     */
+    @Bean
+    public AuthenticationSuccessHandler rememberMeAuthenticationSuccessHandler() {
+        return new SimpleUrlAuthenticationSuccessHandler() {
+            @Override
+            public void onAuthenticationSuccess(HttpServletRequest request,
+                                                HttpServletResponse response,
+                                                Authentication authentication) throws IOException, ServletException {
+                // Spring Security will then check authorization and redirect to 403 if needed
+                clearAuthenticationAttributes(request);
+            }
+        };
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
                         // Public resources
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/webjars/**").permitAll()
-                        .requestMatchers("/login", "/register", "/","/403").permitAll()
+                        .requestMatchers("/login", "/register", "/", "/403").permitAll()
 
-                        // Admin only access
+                        // Admin only access - ORDER MATTERS!
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/category/**").hasRole("ADMIN")
                         .requestMatchers("/author/**").hasRole("ADMIN")
+                        .requestMatchers("/book/**").hasRole("ADMIN")
 
                         // Customer access (both USER and ADMIN can access customer pages)
                         .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
@@ -60,30 +88,31 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .rememberMe(remember -> remember
-                        .key("mySecretKey") // Change this to a secure random key in production
-                        .tokenValiditySeconds(86400) // 24 hours = 86400 seconds
+                        .key("mySecretKey")
+                        .tokenValiditySeconds(86400)
                         .userDetailsService(customUserDetailsService)
-                        .rememberMeParameter("remember-me") // Name of the checkbox parameter
+                        .rememberMeParameter("remember-me")
                         .rememberMeCookieName("remember-me-cookie")
+                        .authenticationSuccessHandler(rememberMeAuthenticationSuccessHandler())
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID", "remember-me-cookie") // Also delete remember-me cookie on logout
+                        .deleteCookies("JSESSIONID", "remember-me-cookie")
                         .permitAll()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(1) // Allow only one session per user
-                        .maxSessionsPreventsLogin(false) // Allow new login to invalidate old session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
                 )
                 .exceptionHandling(exception -> exception
-                        .accessDeniedPage("/403") // Custom 403 error page
+                        .accessDeniedPage("/403")
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/admin/**","/category/**","/logout")
+                        .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**", "/book/**", "/logout")
                 );
 
         return http.build();

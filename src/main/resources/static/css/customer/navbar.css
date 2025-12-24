@@ -1,0 +1,42 @@
+/* Fix navbar scrolling behavior */
+/* Make the entire header-wrap sticky, not just the menu */
+#header-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Ensure top-content stays visible */
+.top-content {
+    background: #fff;
+}
+
+/* Remove any conflicting sticky behavior from child elements */
+#header {
+    position: relative;
+}
+
+/* Ensure Sign out button has no border */
+.logout-btn {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.logout-btn:hover,
+.logout-btn:focus,
+.logout-btn:active {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Remove Bootstrap button focus styles */
+.btn-link:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}

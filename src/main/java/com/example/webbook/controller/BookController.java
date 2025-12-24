@@ -13,6 +13,7 @@ import com.example.webbook.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +41,9 @@ public class BookController {
     @Autowired
     private AuthorService authorService;
 
-    // View all books with pagination and search
+    // View all books with pagination and search for Admin
     @GetMapping("/books")
+    @PreAuthorize("hasRole('ADMIN')")
     public String viewBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -82,6 +84,7 @@ public class BookController {
 
     // Show create book form
     @GetMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {
         model.addAttribute("authors", authorRepository.findAll());
         model.addAttribute("categories", categoryRepository.findAll());
@@ -90,6 +93,7 @@ public class BookController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> createBook(@ModelAttribute AddBookForm addBookForm) {
         Map<String, Object> response = new HashMap<>();
@@ -125,6 +129,7 @@ public class BookController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showEditForm(@PathVariable("id") String id, Model model) {
         try {
             UUID bookId = UUID.fromString(id);
@@ -161,6 +166,7 @@ public class BookController {
 
     // Update book - Use UpdateBookForm
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateBook(
             @PathVariable("id") String id,
@@ -198,6 +204,7 @@ public class BookController {
 
     // View book details
     @GetMapping("/view/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String viewBookDetail(@PathVariable("id") String id, Model model) {
         try {
             UUID bookId = UUID.fromString(id);
@@ -219,6 +226,7 @@ public class BookController {
 
     // Delete single book
     @PostMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteBook(@PathVariable("id") String id) {
         Map<String, Object> response = new HashMap<>();
