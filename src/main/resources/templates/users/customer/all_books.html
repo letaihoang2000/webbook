@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Books - BookSaw</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}" content=""/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" content=""/>
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <link rel="stylesheet" th:href="@{/css/normalize.css}">
+    <link rel="stylesheet" th:href="@{/icomoon/icomoon.css}">
+    <link rel="stylesheet" th:href="@{/css/vendor.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/home.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/all_books.css}">
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#header" tabindex="0">
+
+<!-- Include Navbar Fragment -->
+<div th:replace="~{fragments/customer_navbar :: navbar}"></div>
+
+<!-- Page Header Section -->
+<section id="all-books-header" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section-header align-center">
+                    <div class="title">
+                        <span>Discover our collection</span>
+                    </div>
+                    <h2 class="section-title">All Books</h2>
+                    <p class="results-info" th:if="${totalBooks > 0}">
+                        Showing <strong th:text="${books.size()}"></strong> of <strong th:text="${totalBooks}"></strong> books
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section id="filters-section" class="py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="filters-wrapper">
+                    <!-- Search Box -->
+                    <form th:action="@{/customer/all-books}" method="get" class="search-form">
+                        <div class="search-bar">
+                            <input type="text"
+                                   name="search"
+                                   th:value="${search}"
+                                   class="search-field text search-input"
+                                   placeholder="Search by title or author...">
+                            <button type="submit" class="btn btn-accent" id="search-btn">
+                                <i class="icon icon-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Category Filters -->
+                    <div class="category-filter-tabs">
+                        <ul class="tabs">
+                            <li class="tab" th:classappend="${categoryId == null} ? 'active' : ''">
+                                <a th:href="@{/customer/all-books}">All Categories</a>
+                            </li>
+                            <li th:each="category : ${categories}"
+                                class="tab"
+                                th:classappend="${categoryId == category.id} ? 'active' : ''">
+                                <a th:href="@{/customer/all-books(categoryId=${category.id})}"
+                                   th:text="${category.name}">Category</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Books Grid Section -->
+<section id="all-books-grid" class="bookshelf py-5 my-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Books Grid -->
+                <div class="product-list" th:if="${!books.isEmpty()}">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-4" th:each="book : ${books}">
+                            <div class="product-item">
+                                <figure class="product-style">
+                                    <img th:src="${book.image}"
+                                         th:alt="${book.title}"
+                                         class="product-item">
+
+                                    <!-- Action Icons Overlay -->
+                                    <div class="product-actions">
+                                        <!-- View Details Button -->
+                                        <a th:href="@{/customer/book/{id}(id=${book.book_id})}"
+                                           class="action-btn view-btn"
+                                           title="View Details">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                <path d="M288 80c-65.2 0-118.8 29.6-159.9 67.7C89.6 183.5 63 226 49.4 256c13.6 30 40.2 72.5 78.6 108.3C169.2 402.4 222.8 432 288 432s118.8-29.6 159.9-67.7C486.4 328.5 513 286 526.6 256c-13.6-30-40.2-72.5-78.6-108.3C406.8 109.6 353.2 80 288 80zM95.4 112.6C142.5 68.8 207.2 32 288 32s145.5 36.8 192.6 80.6c46.8 43.5 78.1 95.4 93 131.1c3.3 7.9 3.3 16.7 0 24.6c-14.9 35.7-46.2 87.7-93 131.1C433.5 443.2 368.8 480 288 480s-145.5-36.8-192.6-80.6C48.6 356 17.3 304 2.5 268.3c-3.3-7.9-3.3-16.7 0-24.6C17.3 208 48.6 156 95.4 112.6zM288 336c44.2 0 80-35.8 80-80s-35.8-80-80-80c-.7 0-1.3 0-2 0c1.3 5.1 2 10.5 2 16c0 35.3-28.7 64-64 64c-5.5 0-10.9-.7-16-2c0 .7 0 1.3 0 2c0 44.2 35.8 80 80 80zm0-208a128 128 0 1 1 0 256 128 128 0 1 1 0-256z"/>
+                                            </svg>
+                                        </a>
+
+                                        <!-- Add to Cart Button -->
+                                        <button type="button"
+                                                class="action-btn cart-btn"
+                                                title="Add to Cart">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                                <path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/>
+                                            </svg>
+                                        </button>
+
+                                        <!-- Wishlist Button - Shows Heart when not in wishlist, X when in wishlist -->
+                                        <button type="button"
+                                                class="action-btn wishlist-btn"
+                                                th:classappend="${wishlistBookIds.contains(book.book_id)} ? 'in-wishlist' : ''"
+                                                th:attr="data-book-id=${book.book_id}"
+                                                th:title="${wishlistBookIds.contains(book.book_id)} ? 'Remove from Wishlist' : 'Add to Wishlist'">
+                                            <!-- Heart Icon (shown when NOT in wishlist) -->
+                                            <svg th:if="${!wishlistBookIds.contains(book.book_id)}"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="heart-icon">
+                                                <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                                            </svg>
+                                            <!-- X Icon (shown when IN wishlist) -->
+                                            <svg th:if="${wishlistBookIds.contains(book.book_id)}"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="x-icon">
+                                                <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </figure>
+                                <figcaption>
+                                    <div class="item-category" th:text="${book.category_name}">Category</div>
+                                    <h3 class="item-title">
+                                        <a th:href="@{/customer/book/{id}(id=${book.book_id})}"
+                                           th:text="${book.title}">Book Title</a>
+                                    </h3>
+                                    <span class="item-author" th:text="${book.author_name}">Author Name</span>
+                                    <div class="item-price">$ <span th:text="${book.price}">0.00</span></div>
+                                </figcaption>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Books Message -->
+                <div class="no-books-found" th:if="${books.isEmpty()}">
+                    <div class="text-center py-5">
+                        <i class="icon icon-book" style="font-size: 4rem; color: #ccc;"></i>
+                        <h3 class="mt-3">No books found</h3>
+                        <p class="text-muted">Try adjusting your search or filter criteria</p>
+                        <a th:href="@{/customer/all-books}" class="btn btn-outline-accent btn-accent-arrow mt-3">
+                            View All Books<i class="icon icon-ns-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-wrapper" th:if="${totalPages > 1}">
+                    <nav class="navigation pagination">
+                        <div class="nav-links">
+                            <!-- Previous Button -->
+                            <a th:if="${currentPage > 0}"
+                               th:href="@{/customer/all-books(page=${currentPage - 1}, search=${search}, categoryId=${categoryId})}"
+                               class="page-numbers">
+                                <i class="icon icon-arrow-left"></i>
+                            </a>
+
+                            <!-- Page Numbers -->
+                            <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                <a th:if="${i != currentPage}"
+                                   th:href="@{/customer/all-books(page=${i}, search=${search}, categoryId=${categoryId})}"
+                                   class="page-numbers"
+                                   th:text="${i + 1}">1</a>
+                                <span th:if="${i == currentPage}"
+                                      class="page-numbers current"
+                                      th:text="${i + 1}">1</span>
+                            </span>
+
+                            <!-- Next Button -->
+                            <a th:if="${currentPage < totalPages - 1}"
+                               th:href="@{/customer/all-books(page=${currentPage + 1}, search=${search}, categoryId=${categoryId})}"
+                               class="page-numbers">
+                                <i class="icon icon-arrow-right"></i>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="footer-item">
+                    <div class="company-brand">
+                        <img th:src="@{/images/main-logo.png}" alt="logo" class="footer-logo">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus liberolectus
+                            nonet psryroin. Amet sed lorem posuere sit iaculis amet, ac urna.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="footer-menu">
+                    <h5>About Us</h5>
+                    <ul class="menu-list">
+                        <li class="menu-item"><a href="#">vision</a></li>
+                        <li class="menu-item"><a href="#">articles</a></li>
+                        <li class="menu-item"><a href="#">careers</a></li>
+                        <li class="menu-item"><a href="#">service terms</a></li>
+                        <li class="menu-item"><a href="#">donate</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="footer-menu">
+                    <h5>Discover</h5>
+                    <ul class="menu-list">
+                        <li class="menu-item"><a th:href="@{/customer/home}">Home</a></li>
+                        <li class="menu-item"><a th:href="@{/customer/all-books}">Books</a></li>
+                        <li class="menu-item"><a href="#">Authors</a></li>
+                        <li class="menu-item"><a href="#">Subjects</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="footer-menu">
+                    <h5>My account</h5>
+                    <ul class="menu-list">
+                        <li class="menu-item"><a href="#">Sign In</a></li>
+                        <li class="menu-item"><a href="#">View Cart</a></li>
+                        <li class="menu-item"><a href="#">My Wishlist</a></li>
+                        <li class="menu-item"><a href="#">Track My Order</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="footer-menu">
+                    <h5>Help</h5>
+                    <ul class="menu-list">
+                        <li class="menu-item"><a href="#">Help center</a></li>
+                        <li class="menu-item"><a href="#">Report a problem</a></li>
+                        <li class="menu-item"><a href="#">Suggesting edits</a></li>
+                        <li class="menu-item"><a href="#">Contact us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div id="footer-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>© 2022 All rights reserved. Free HTML Template by
+                                href="https://www.templatesjungle.com/" target="_blank">TemplatesJungle</a></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="social-links align-right">
+                                <ul>
+                                    <li><a href="#"><i class="icon icon-facebook"></i></a></li>
+                                    <li><a href="#"><i class="icon icon-twitter"></i></a></li>
+                                    <li><a href="#"><i class="icon icon-youtube-play"></i></a></li>
+                                    <li><a href="#"><i class="icon icon-behance-square"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{modals/customer/signout :: logoutModal}"></div>
+
+<script th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+<script th:src="@{/js/plugins.js}"></script>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/customer/signout.js}"></script>
+<script th:src="@{/js/customer/wishlist.js}"></script>
+
+</body>
+</html>

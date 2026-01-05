@@ -66,14 +66,15 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/webjars/**").permitAll()
                         .requestMatchers("/login", "/register", "/", "/403").permitAll()
 
-                        // Admin only access - ORDER MATTERS!
+                        // Admin only access
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/category/**").hasRole("ADMIN")
                         .requestMatchers("/author/**").hasRole("ADMIN")
                         .requestMatchers("/book/**").hasRole("ADMIN")
 
-                        // Customer access (both USER and ADMIN can access customer pages)
+                        // Customer and Wishlist access
                         .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/wishlist/**").hasAnyRole("USER", "ADMIN")
 
                         // Any other request needs authentication
                         .anyRequest().authenticated()
@@ -112,7 +113,7 @@ public class SecurityConfig {
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**", "/book/**", "/logout")
+                        .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**", "/book/**", "/logout", "/wishlist/**")  // ADD /wishlist/** HERE
                 );
 
         return http.build();

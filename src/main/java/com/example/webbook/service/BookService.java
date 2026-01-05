@@ -349,7 +349,7 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    private BookInfo convertToBookInfo(Book book) {
+    public BookInfo convertToBookInfo(Book book) {
         BookInfo bookInfo = new BookInfo();
         bookInfo.setBook_id(book.getId().toString());
         bookInfo.setTitle(book.getTitle());
@@ -384,6 +384,32 @@ public class BookService {
         }
 
         return bookInfo;
+    }
+
+    // Search books by title or author
+    public Page<BookInfo> searchBooksPaginated(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+
+        // Search in both title and author name
+        Page<Book> bookPage = bookRepository.findByTitleOrAuthorContaining(query, pageable);
+
+        return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Get books by category
+    public Page<BookInfo> getBooksByCategoryPaginated(Long categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Get books by category ID (limited results for related books)
+    public List<BookInfo> getBooksByCategoryId(Long categoryId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.getContent().stream()
+                .map(this::convertToBookInfo)
+                .collect(Collectors.toList());
     }
 }
 

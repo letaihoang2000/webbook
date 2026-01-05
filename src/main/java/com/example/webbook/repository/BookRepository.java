@@ -38,4 +38,14 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
 
     @Query("SELECT COUNT(b) FROM Book b JOIN b.author a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :authorName, '%'))")
     long countByAuthorNameContaining(@Param("authorName") String authorName);
+
+    // Search in both title and author name
+    @Query("SELECT b FROM Book b LEFT JOIN b.author a WHERE " +
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<Book> findByTitleOrAuthorContaining(@Param("query") String query, Pageable pageable);
+
+    // Find by category
+    @Query("SELECT b FROM Book b WHERE b.category.id = :categoryId")
+    Page<Book> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 }
