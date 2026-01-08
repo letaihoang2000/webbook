@@ -1,0 +1,181 @@
+/* Toast Notification Styles - For Cart and Wishlist */
+
+/* Cart Toast Notification */
+.cart-notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 400px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.cart-notification-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.cart-notification-toast.success {
+    border-left: 4px solid #27ae60;
+}
+
+.cart-notification-toast.error {
+    border-left: 4px solid #e74c3c;
+}
+
+.cart-notification-toast .toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.cart-notification-toast.success .toast-icon {
+    color: #27ae60;
+}
+
+.cart-notification-toast.error .toast-icon {
+    color: #e74c3c;
+}
+
+.cart-notification-toast .toast-message {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Wishlist Notification */
+.wishlist-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 400px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-100px);
+    transition: all 0.3s ease;
+}
+
+.wishlist-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.wishlist-notification.success {
+    border-left: 4px solid #27ae60;
+}
+
+.wishlist-notification.error {
+    border-left: 4px solid #e74c3c;
+}
+
+.wishlist-notification.info {
+    border-left: 4px solid #3498db;
+}
+
+.wishlist-notification i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.wishlist-notification.success i {
+    color: #27ae60;
+}
+
+.wishlist-notification.error i {
+    color: #e74c3c;
+}
+
+.wishlist-notification.info i {
+    color: #3498db;
+}
+
+.wishlist-notification span {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Cart Toast (on cart page) */
+.cart-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    min-width: 300px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 0.3s ease;
+    border-left: 4px solid #27ae60;
+}
+
+.cart-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cart-toast.error {
+    border-left-color: #e74c3c;
+}
+
+.cart-toast .toast-icon {
+    font-size: 1.5rem;
+    color: #27ae60;
+    flex-shrink: 0;
+}
+
+.cart-toast.error .toast-icon {
+    color: #e74c3c;
+}
+
+.cart-toast .toast-message {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cart-notification-toast,
+    .wishlist-notification {
+        min-width: 280px;
+        max-width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+        margin: 0 auto;
+    }
+
+    .cart-toast {
+        min-width: 280px;
+        max-width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+        bottom: 20px;
+    }
+}

@@ -22,22 +22,34 @@
                     </div>
                     <div class="col-md-6">
                         <div class="right-element">
+                            <!-- Profile/Account Link -->
                             <a th:href="@{/customer/profile}" class="user-account for-buy">
-                                <i class="icon icon-user"></i><span>Account</span>
+                                <i class="icon icon-user"></i>
+                                <span>Account</span>
                             </a>
-                            <a href="#" class="cart for-buy">
-                                <i class="icon icon-clipboard"></i><span>Cart:(0 $)</span>
+
+                            <!-- Wishlist Link with Inline Number -->
+                            <a th:href="@{/wishlist}" class="wishlist for-buy">
+                                <svg style="color: #e74c3c; height: 3vh; width: 3vh;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+                                </svg>
+                                <span>Wishlist</span>
+                                <span class="inline-count wishlist-count"
+                                      th:if="${wishlistCount != null && wishlistCount > 0}"
+                                      th:text="${wishlistCount}">0</span>
                             </a>
-                            <div class="action-menu">
-                                <div class="search-bar">
-                                    <a href="#" class="search-button search-toggle" data-selector="#header-wrap">
-                                        <i class="icon icon-search"></i>
-                                    </a>
-                                    <form role="search" method="get" class="search-box">
-                                        <input class="search-field text search-input" placeholder="Search" type="search">
-                                    </form>
-                                </div>
-                            </div>
+
+                            <!-- Cart Link with Inline Number -->
+                            <a th:href="@{/cart}" class="cart for-buy">
+                                <svg style="color: #27ae60; height: 3vh; width: 3vh;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                </svg>
+                                <span>Cart</span>
+                                <span class="inline-count cart-count"
+                                      th:if="${cartSummary != null && cartSummary.itemCount > 0}"
+                                      th:text="${cartSummary.itemCount}">0</span>
+                            </a>
+
                         </div>
                     </div>
                 </div>
@@ -64,12 +76,6 @@
                                     </li>
                                     <li class="menu-item">
                                         <a th:href="@{/customer/all-books}" class="nav-link">All Books</a>
-                                    </li>
-                                    <li class="menu-item">
-                                        <a th:href="@{/wishlist}" class="nav-link">
-                                            Wishlist
-                                            <span class="wishlist-count-badge" th:if="${wishlistCount > 0}" th:text="${wishlistCount}"></span>
-                                        </a>
                                     </li>
                                     <li class="menu-item">
                                         <a href="#special-offer" class="nav-link">Offer</a>

@@ -2,14 +2,28 @@ $(document).ready(function() {
     console.log('Wishlist.js loaded successfully');
     console.log('jQuery version:', $.fn.jquery);
 
-    // Update wishlist count in navbar
+    // Update wishlist count in navbar with INLINE badges
     function updateWishlistCount(count) {
         console.log('Updating wishlist count:', count);
-        $('.wishlist-count').text(count);
+
+        // Update top navbar inline count
+        const $topInlineCount = $('.wishlist.for-buy .inline-count.wishlist-count');
         if (count > 0) {
-            $('.wishlist-count-badge').text(count).show();
+            if ($topInlineCount.length === 0) {
+                $('.wishlist.for-buy').append(`<span class="inline-count wishlist-count">${count}</span>`);
+            } else {
+                $topInlineCount.text(count).addClass('updated');
+                setTimeout(() => $topInlineCount.removeClass('updated'), 500);
+            }
         } else {
-            $('.wishlist-count-badge').hide();
+            $topInlineCount.remove();
+        }
+
+        // Update navigation menu inline count
+        const $navLink = $('.menu-list a[href="/wishlist"]');
+        $navLink.find('.nav-inline-count').remove();
+        if (count > 0) {
+            $navLink.append(`<span class="nav-inline-count">${count}</span>`);
         }
     }
 
@@ -117,7 +131,7 @@ $(document).ready(function() {
                         console.log('Book removed from wishlist');
                     }
 
-                    // Update wishlist count in navbar if exists
+                    // Update wishlist count in navbar WITH INLINE BADGES
                     updateWishlistCount(response.count);
                 } else {
                     console.error('Response success=false:', response.message);
@@ -177,7 +191,7 @@ $(document).ready(function() {
                     setTimeout(function() {
                         wishlistItem.remove();
 
-                        // Update count
+                        // Update count WITH INLINE BADGES
                         updateWishlistCount(response.count);
 
                         // Check if wishlist is now empty

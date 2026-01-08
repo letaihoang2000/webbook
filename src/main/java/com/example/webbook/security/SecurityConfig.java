@@ -75,6 +75,7 @@ public class SecurityConfig {
                         // Customer and Wishlist access
                         .requestMatchers("/customer/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/wishlist/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/cart/**").hasAnyRole("USER", "ADMIN")
 
                         // Any other request needs authentication
                         .anyRequest().authenticated()
@@ -113,7 +114,8 @@ public class SecurityConfig {
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**", "/book/**", "/logout", "/wishlist/**")  // ADD /wishlist/** HERE
+                        .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**",
+                                "/book/**", "/logout", "/wishlist/**","/cart/**")
                 );
 
         return http.build();

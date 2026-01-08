@@ -3,6 +3,7 @@ package com.example.webbook.controller;
 import com.example.webbook.dto.UserRegister;
 import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.security.CustomUserDetails;
+import com.example.webbook.service.CartService;
 import com.example.webbook.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,9 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CartService cartService;
 
     @GetMapping("/")
     public String index() {

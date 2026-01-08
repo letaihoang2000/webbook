@@ -1,0 +1,326 @@
+/* Navbar Badge Styles */
+
+/* Top navbar badges (absolute positioned on icons) */
+.count-badge {
+    display: inline-block;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.2;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 10;
+}
+
+.wishlist-badge {
+    background: #e74c3c;
+}
+
+.cart-badge {
+    background: #27ae60;
+}
+
+/* Navigation menu badges (inline with text) */
+.nav-count-badge {
+    display: inline-block;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1.2;
+    vertical-align: super;
+}
+
+/* Top navbar link styles */
+.right-element {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-left: 28vh;
+}
+
+.right-element a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.right-element a:hover {
+    color: #9c8e6e;
+}
+
+/* Icon styles */
+.right-element a i {
+    font-size: 1.3rem;
+}
+
+/* User account icon */
+.user-account i {
+    color: #333;
+}
+
+/* Wishlist icon - heart (red) */
+.wishlist i {
+    color: #e74c3c;
+}
+
+/* Cart icon (green) */
+.cart i {
+    color: #27ae60;
+}
+
+/* INLINE NUMBER BADGES - Beside icons in top navbar */
+.inline-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 2px 6px;
+    border-radius: 11px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin-left: 4px;
+}
+
+/* Wishlist count - red background */
+.wishlist-count {
+    background: #e74c3c;
+}
+
+/* Cart count - green background */
+.cart-count {
+    background: #27ae60;
+}
+
+/* INLINE NUMBER BADGES - In navigation menu */
+.nav-inline-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    background: #e74c3c;
+    margin-left: 6px;
+}
+
+/* Navigation menu icons */
+.nav-link i {
+    margin-right: 4px;
+    font-size: 1rem;
+}
+
+/* Badge animations - pulse when updated */
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.inline-count.updated,
+.nav-inline-count.updated {
+    animation: badgePulse 0.5s ease;
+}
+
+/* Hide empty badges */
+.inline-count:empty,
+.nav-inline-count:empty {
+    display: none;
+}
+
+/* Action menu positioning */
+.action-menu {
+    margin-left: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .right-element {
+        gap: 18px;
+    }
+
+    .right-element a {
+        font-size: 0.9rem;
+    }
+
+    .right-element a i {
+        font-size: 1.2rem;
+    }
+
+    .inline-count {
+        min-width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .right-element {
+        gap: 12px;
+    }
+
+    /* Hide text labels on mobile, keep only icons and numbers */
+    .right-element a span:not(.inline-count) {
+        display: none;
+    }
+
+    .right-element a {
+        padding: 6px;
+    }
+
+    .inline-count {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+        margin-left: 2px;
+    }
+}
+
+/* Make sure numbers don't wrap */
+.inline-count,
+.nav-inline-count {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* User account icon */
+.user-account i {
+    color: #333;
+}
+
+/* Wishlist icon - heart */
+.wishlist i {
+    color: #e74c3c;
+}
+
+/* Cart icon */
+.cart i {
+    color: #27ae60;
+}
+
+/* Cart text styling */
+.cart span {
+    font-weight: 500;
+}
+
+.cart-count,
+.cart-total {
+    font-weight: 600;
+}
+
+/* Navigation menu icons */
+.nav-link i {
+    margin-right: 4px;
+    font-size: 1rem;
+}
+
+/* Badge animations */
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.count-badge.updated,
+.nav-count-badge.updated {
+    animation: badgePulse 0.4s ease;
+}
+
+/* Hide empty badges */
+.count-badge:empty,
+.nav-count-badge:empty {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .right-element {
+        gap: 15px;
+    }
+
+    .right-element a {
+        font-size: 0.9rem;
+    }
+
+    .right-element a i {
+        font-size: 1.1rem;
+    }
+
+    .count-badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+        min-width: 16px;
+        top: -6px;
+        right: -6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .right-element {
+        gap: 10px;
+    }
+
+    /* Hide text on mobile, keep only icons */
+    .right-element a span:not(.count-badge) {
+        display: none;
+    }
+
+    .right-element a {
+        padding: 8px;
+    }
+
+    .count-badge {
+        top: -4px;
+        right: -4px;
+    }
+}
+
+/* Action menu positioning */
+.action-menu {
+    margin-left: 10px;
+}
+
+/* Search bar styling */
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    color: #333;
+    transition: color 0.3s;
+}
+
+.search-button:hover {
+    color: #9c8e6e;
+}

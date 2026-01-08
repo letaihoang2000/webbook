@@ -4,10 +4,7 @@ import com.example.webbook.dto.BookInfo;
 import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.model.User;
 import com.example.webbook.security.CustomUserDetails;
-import com.example.webbook.service.BookService;
-import com.example.webbook.service.CategoryService;
-import com.example.webbook.service.UserService;
-import com.example.webbook.service.WishlistService;
+import com.example.webbook.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -35,15 +31,21 @@ public class CustomerController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/home")
-    public String customerHome(Model model) {
-        // Get current authenticated user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    @Autowired
+    private CartService cartService;
 
-        // Add user info to model
-        model.addAttribute("currentUser", userDetails.getUser());
+    @GetMapping("/home")
+    public String customerHome(Model model, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
+        long wishlistCount = wishlistService.getWishlistBookIds(user.getId()).size();
+
+        model.addAttribute("currentUser", user);
         model.addAttribute("userName", userDetails.getFullName());
+        model.addAttribute("cartSummary", cartSummary);
+        model.addAttribute("wishlistCount", wishlistCount);
 
         return "users/customer/home";
     }
@@ -53,7 +55,12 @@ public class CustomerController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User currentUser = userDetails.getUser();
 
+        Map<String, Object> cartSummary = cartService.getCartSummary(currentUser.getId());
+        long wishlistCount = wishlistService.getWishlistBookIds(currentUser.getId()).size();
+
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("cartSummary", cartSummary);
+        model.addAttribute("wishlistCount", wishlistCount);
 
         return "users/customer/profile";
     }
@@ -121,6 +128,9 @@ public class CustomerController {
         // Get wishlist book IDs for current user
         Set<String> wishlistBookIds = wishlistService.getWishlistBookIds(user.getId());
 
+        Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
+        long wishlistCount = wishlistBookIds.size();
+
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("wishlistBookIds", wishlistBookIds);
         model.addAttribute("currentPage", page);
@@ -131,6 +141,8 @@ public class CustomerController {
         model.addAttribute("search", search);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("cartSummary", cartSummary);
+        model.addAttribute("wishlistCount", wishlistCount);
 
         return "users/customer/all_books";
     }
@@ -144,26 +156,26 @@ public class CustomerController {
             UUID bookId = UUID.fromString(id);
             BookInfo bookInfo = bookService.getBookInfoById(bookId);
 
-            // Get related books from the same category
             List<BookInfo> relatedBooks = bookService.getBooksByCategoryId(
                     Long.parseLong(bookInfo.getCategory_id()), 4
             );
-
-            // Remove current book from related books
             relatedBooks.removeIf(book -> book.getBook_id().equals(id));
 
-            // Get current user from CustomUserDetails
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
 
-            // Check if book is in wishlist
             boolean isInWishlist = wishlistService.isInWishlist(user.getId(), bookId);
             Set<String> wishlistBookIds = wishlistService.getWishlistBookIds(user.getId());
+
+            Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
+            long wishlistCount = wishlistBookIds.size();
 
             model.addAttribute("book", bookInfo);
             model.addAttribute("relatedBooks", relatedBooks);
             model.addAttribute("isInWishlist", isInWishlist);
             model.addAttribute("wishlistBookIds", wishlistBookIds);
+            model.addAttribute("cartSummary", cartSummary);
+            model.addAttribute("wishlistCount", wishlistCount);
 
             return "users/customer/book_detail";
         } catch (Exception e) {

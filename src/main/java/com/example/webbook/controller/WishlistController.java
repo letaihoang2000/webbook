@@ -3,6 +3,7 @@ package com.example.webbook.controller;
 import com.example.webbook.dto.BookInfo;
 import com.example.webbook.model.User;
 import com.example.webbook.security.CustomUserDetails;
+import com.example.webbook.service.CartService;
 import com.example.webbook.service.CategoryService;
 import com.example.webbook.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +28,23 @@ public class WishlistController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private CartService cartService;
+
     // View wishlist page
     @GetMapping
     public String viewWishlist(Model model, Authentication authentication) {
-        // Get current user from CustomUserDetails
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
 
         List<BookInfo> wishlistBooks = wishlistService.getUserWishlist(user.getId());
+        Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
 
         model.addAttribute("books", wishlistBooks);
         model.addAttribute("totalBooks", wishlistBooks.size());
         model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("wishlistCount", wishlistBooks.size());
+        model.addAttribute("cartSummary", cartSummary);
 
         return "users/customer/wishlist";
     }
