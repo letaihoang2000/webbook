@@ -188,6 +188,62 @@
     border-color: #c0392b;
 }
 
+/* Wishlist Notifications */
+.wishlist-notification {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 99999;
+    transform: translateX(400px);
+    transition: transform 0.3s ease-out;
+    min-width: 280px;
+}
+
+.wishlist-notification.show {
+    transform: translateX(0);
+}
+
+.wishlist-notification.success {
+    border-left: 4px solid #27ae60;
+}
+
+.wishlist-notification.error {
+    border-left: 4px solid #e74c3c;
+}
+
+.wishlist-notification.info {
+    border-left: 4px solid #3498db;
+}
+
+.wishlist-notification i {
+    font-size: 1.5rem;
+}
+
+.wishlist-notification.success i {
+    color: #27ae60;
+}
+
+.wishlist-notification.error i {
+    color: #e74c3c;
+}
+
+.wishlist-notification.info i {
+    color: #3498db;
+}
+
+.wishlist-notification span {
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
 /* Purchase Benefits */
 .purchase-benefits {
     background: #f9f9f9;

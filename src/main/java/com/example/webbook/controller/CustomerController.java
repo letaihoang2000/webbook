@@ -1,25 +1,24 @@
 package com.example.webbook.controller;
 
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.model.User;
 import com.example.webbook.security.CustomUserDetails;
 import com.example.webbook.service.BookService;
 import com.example.webbook.service.CategoryService;
+import com.example.webbook.service.UserService;
 import com.example.webbook.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/customer")
@@ -32,6 +31,9 @@ public class CustomerController {
 
     @Autowired
     private WishlistService wishlistService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/home")
     public String customerHome(Model model) {
@@ -47,13 +49,44 @@ public class CustomerController {
     }
 
     @GetMapping("/profile")
-    public String customerProfile(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public String customerProfile(Model model, Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User currentUser = userDetails.getUser();
 
-        model.addAttribute("currentUser", userDetails.getUser());
+        model.addAttribute("currentUser", currentUser);
 
         return "users/customer/profile";
+    }
+
+    @PostMapping("/profile/update")
+    @ResponseBody
+    public ResponseEntity<?> updateProfile(
+            @ModelAttribute UpdateUserForm updateUserForm,
+            Authentication authentication) {
+        try {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User currentUser = userDetails.getUser();
+
+            // Set the user ID from the authenticated user
+            updateUserForm.setId(currentUser.getId().toString());
+
+            // Update user
+            User updatedUser = userService.updateUser(updateUserForm);
+
+            // Return success response with updated user data
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Profile updated successfully!");
+            response.put("user", updatedUser);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to update profile: " + e.getMessage());
+
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @GetMapping("/all-books")

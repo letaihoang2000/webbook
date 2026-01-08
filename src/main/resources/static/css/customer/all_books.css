@@ -27,33 +27,46 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(51, 51, 51, 0.95); /* Dark background */
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     text-decoration: none;
-    color: #333;
+    color: #fff;
     padding: 10px;
 }
 
 .action-btn svg {
     width: 20px;
     height: 20px;
-    fill: currentColor;
+    fill: #fff; /* White icons */
     transition: all 0.3s;
 }
 
+/* View button */
 .view-btn {
-    background: rgba(52, 152, 219, 0.95);
+    background: rgba(52, 152, 219, 0.95); /* Blue background */
     color: #fff;
+}
+
+.view-btn svg {
+    fill: #fff;
 }
 
 .view-btn:hover {
     background: #2980b9;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(41, 128, 185, 0.6);
+}
+
+/* Cart button */
+.cart-btn {
+    background: rgba(46, 204, 113, 0.95); /* Green background */
     color: #fff;
 }
 
@@ -64,49 +77,45 @@
 .cart-btn:hover {
     background: #27ae60;
     color: #fff;
-}
-
-.action-btn:hover {
-    background: #9c8e6e;
-    color: #fff;
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(156, 142, 110, 0.5);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.6);
 }
 
-.action-btn:hover svg {
-    fill: #fff;
-}
-
+/* Wishlist button - default state (not in wishlist) */
 .wishlist-btn {
-    background: rgba(255, 255, 255, 0.95);
-    color: #e74c3c;
+    background: rgba(51, 51, 51, 0.95); /* Dark background */
+    color: #fff;
 }
 
 .wishlist-btn svg {
-    fill: #e74c3c;
+    fill: #fff; /* White heart icon */
 }
 
 .wishlist-btn:hover {
-    background: #e74c3c;
+    background: #e74c3c; /* Red on hover */
     color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
 }
 
 .wishlist-btn:hover svg {
     fill: #fff;
 }
 
-/* Wishlist button when book is in wishlist */
+/* Wishlist button when book is in wishlist (shows X icon) */
 .wishlist-btn.in-wishlist {
-    background: #e74c3c !important;
+    background: #e74c3c !important; /* Red background */
     color: #fff !important;
 }
 
 .wishlist-btn.in-wishlist svg {
-    fill: #fff !important;
+    fill: #fff !important; /* White X icon */
 }
 
 .wishlist-btn.in-wishlist:hover {
-    background: #c0392b !important;
+    background: #c0392b !important; /* Darker red on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(192, 57, 43, 0.6);
 }
 
 .wishlist-btn.in-wishlist svg {

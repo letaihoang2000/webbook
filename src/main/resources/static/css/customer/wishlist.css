@@ -27,33 +27,32 @@
     position: relative;
 }
 
-/* Remove Button */
+/* Remove Button - Positioned at bottom with other buttons */
 .remove-wishlist-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(231, 76, 60, 0.95);
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
     transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    color: #fff;
+    padding: 10px;
 }
 
 .remove-wishlist-btn:hover {
-    background: #e74c3c;
-    color: #fff;
-    transform: rotate(90deg);
+    background: #c0392b;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(192, 57, 43, 0.6);
 }
 
 .remove-wishlist-btn i {
     font-size: 1rem;
+    color: #fff;
 }
 
 /* Product Style */
@@ -75,7 +74,7 @@
     transform: scale(1.05);
 }
 
-/* Product Actions */
+/* Product Actions - Same as all_books */
 .wishlist-item .product-actions {
     position: absolute;
     bottom: 20px;
@@ -85,6 +84,7 @@
     gap: 10px;
     opacity: 0;
     transition: opacity 0.3s;
+    z-index: 10;
 }
 
 .wishlist-item .product-style:hover .product-actions {
@@ -92,29 +92,58 @@
 }
 
 .wishlist-item .action-btn {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    background: #fff;
+    background: rgba(51, 51, 51, 0.95);
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     text-decoration: none;
-    color: #333;
+    color: #fff;
+    padding: 10px;
 }
 
-.wishlist-item .action-btn:hover {
-    background: #9c8e6e;
-    color: #fff;
-    transform: translateY(-3px);
+.wishlist-item .action-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+    transition: all 0.3s;
 }
 
 .wishlist-item .action-btn i {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    color: #fff;
+}
+
+/* View button */
+.wishlist-item .view-btn {
+    background: rgba(52, 152, 219, 0.95);
+    color: #fff;
+}
+
+.wishlist-item .view-btn:hover {
+    background: #2980b9;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(41, 128, 185, 0.6);
+}
+
+/* Cart button */
+.wishlist-item .cart-btn {
+    background: rgba(46, 204, 113, 0.95);
+    color: #fff;
+}
+
+.wishlist-item .cart-btn:hover {
+    background: #27ae60;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.6);
 }
 
 /* Figcaption */
@@ -247,15 +276,15 @@
     right: 30px;
     background: #fff;
     padding: 15px 25px;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     display: flex;
     align-items: center;
     gap: 12px;
-    z-index: 9999;
+    z-index: 99999;
     transform: translateX(400px);
     transition: transform 0.3s ease-out;
-    min-width: 250px;
+    min-width: 280px;
 }
 
 .wishlist-notification.show {
@@ -275,7 +304,7 @@
 }
 
 .wishlist-notification i {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
 .wishlist-notification.success i {
@@ -293,5 +322,5 @@
 .wishlist-notification span {
     color: #333;
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 1rem;
 }

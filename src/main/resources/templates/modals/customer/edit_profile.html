@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Edit Profile Modal -->
+<div th:fragment="editProfileModal">
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">
+                        <i class="icon icon-pencil"></i> Edit Profile
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Alert Messages -->
+                    <div id="profileAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                        <span id="profileAlertMessage"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <form id="editProfileForm" enctype="multipart/form-data">
+                        <input type="hidden" name="id" id="editUserId">
+
+                        <!-- Profile Image Upload -->
+                        <div class="mb-3 text-center">
+                            <div class="avatar-upload-container">
+                                <img id="editAvatarPreview"
+                                     src=""
+                                     alt="Profile Picture"
+                                     class="edit-avatar-preview">
+                                <label for="editImageFile" class="avatar-upload-label">
+                                    <i class="icon icon-camera"></i>
+                                    <span>Change Photo</span>
+                                </label>
+                                <input type="file"
+                                       class="d-none"
+                                       id="editImageFile"
+                                       name="imageFile"
+                                       accept="image/*">
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                Accepted formats: JPG, PNG, GIF (Max 5MB)
+                            </small>
+                        </div>
+
+                        <div class="row">
+                            <!-- First Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editFirstName" class="form-label">
+                                    <i class="icon icon-user"></i> First Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="editFirstName"
+                                       name="first_name"
+                                       required>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editLastName" class="form-label">
+                                    <i class="icon icon-user"></i> Last Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="editLastName"
+                                       name="last_name"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Email (Read-only) -->
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">
+                                <i class="icon icon-envelope"></i> Email
+                            </label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="editEmail"
+                                   readonly
+                                   disabled>
+                            <small class="form-text text-muted">Email cannot be changed</small>
+                        </div>
+
+                        <!-- Mobile -->
+                        <div class="mb-3">
+                            <label for="editMobile" class="form-label">
+                                <i class="icon icon-phone"></i> Mobile
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="editMobile"
+                                   name="mobile">
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label for="editAddress" class="form-label">
+                                <i class="icon icon-location"></i> Address
+                            </label>
+                            <textarea class="form-control"
+                                      id="editAddress"
+                                      name="address"
+                                      rows="3"></textarea>
+                        </div>
+
+                        <!-- Password (Optional) -->
+                        <div class="mb-3">
+                            <label for="editPassword" class="form-label">
+                                <i class="icon icon-lock"></i> New Password
+                            </label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="editPassword"
+                                   name="password"
+                                   placeholder="Leave blank to keep current password">
+                            <small class="form-text text-muted">
+                                Only fill this if you want to change your password
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="icon icon-close"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-accent" id="saveProfileBtn">
+                        <span class="btn-text">
+                            <i class="icon icon-check"></i> Save Changes
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Saving...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
