@@ -211,7 +211,7 @@ public class UserService {
         }
     }
 
-    // Update user
+    // Update user for Admin
     public User updateUser(UpdateUserForm updateUserForm) {
         try {
             UUID userId = UUID.fromString(updateUserForm.getId());
@@ -256,6 +256,68 @@ public class UserService {
             return userRepository.save(existingUser);
         } catch(Exception e){
             throw new RuntimeException("Failed to update user: " + e.getMessage());
+        }
+    }
+
+    // Update user profile for customer
+    public User updateProfile(UpdateUserForm updateUserForm) {
+        try {
+            UUID userId = UUID.fromString(updateUserForm.getId());
+            User existingUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Update name fields
+            existingUser.setFirst_name(updateUserForm.getFirst_name());
+            existingUser.setLast_name(updateUserForm.getLast_name());
+
+            // Update fields (email remains unchanged)
+            existingUser.setMobile(updateUserForm.getMobile());
+            existingUser.setAddress(updateUserForm.getAddress());
+
+            // Handle password update with current password verification
+            String newPassword = updateUserForm.getPassword();
+            String currentPassword = updateUserForm.getCurrentPassword();
+
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
+                // Verify current password is provided
+                if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                    throw new RuntimeException("Current password is required to change password");
+                }
+
+                // Verify current password is correct
+                if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
+                    throw new RuntimeException("Current password is incorrect");
+                }
+
+                // Update to new password (front-end already validated strength)
+                existingUser.setPassword(passwordEncoder.encode(newPassword));
+            }
+
+            // Handle image upload if provided
+            MultipartFile imageFile = updateUserForm.getImageFile();
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    // Delete old image if exists
+                    if (existingUser.getImage() != null && !existingUser.getImage().isEmpty()) {
+                        imageUploadService.deleteImage(existingUser.getImage());
+                    }
+
+                    // Upload new image
+                    String imageUrl = imageUploadService.uploadImage(imageFile, existingUser.getId());
+                    existingUser.setImage(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid image file: " + e.getMessage());
+                }
+            }
+
+            // Update timestamp
+            existingUser.setLast_updated(LocalDateTime.now());
+
+            return userRepository.save(existingUser);
+        } catch(Exception e){
+            throw new RuntimeException(e.getMessage());
         }
     }
 

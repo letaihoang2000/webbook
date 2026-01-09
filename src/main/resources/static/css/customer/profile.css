@@ -375,3 +375,152 @@
     border-radius: 6px;
     align-content: center;
 }
+
+/* Password Change Section */
+.password-change-section {
+    margin-top: 20px;
+}
+
+.password-change-section h6 {
+    color: #333;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-change-section h6 i {
+    color: #9c8e6e;
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-input-wrapper .form-control {
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: color 0.3s;
+}
+
+.toggle-password:hover {
+    color: #9c8e6e;
+}
+
+.toggle-password i {
+    font-size: 1.1rem;
+}
+
+.password-match-feedback {
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+.password-match-feedback.match {
+    color: #28a745;
+    display: block !important;
+}
+
+.password-match-feedback.no-match {
+    color: #dc3545;
+    display: block !important;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    height: 5px;
+    background: #e5e5e5;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.password-strength-bar {
+    height: 100%;
+    transition: all 0.3s;
+    border-radius: 3px;
+}
+
+.password-strength-bar.weak {
+    width: 33%;
+    background: #dc3545;
+}
+
+.password-strength-bar.medium {
+    width: 66%;
+    background: #ffc107;
+}
+
+.password-strength-bar.strong {
+    width: 100%;
+    background: #28a745;
+}
+
+#passwordRequirements {
+    display: block;
+    margin-top: 5px;
+}
+
+#passwordRequirements.valid {
+    color: #28a745;
+}
+
+#passwordRequirements.invalid {
+    color: #dc3545;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+    }
+}
+
+/* Current Password Error */
+#currentPasswordError {
+    font-size: 0.875rem;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+#currentPasswordContainer {
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+}
+
+#show-new-pass{
+    height: 10%;
+    margin-top: -1.5vh;
+    margin-right: -1vh;
+}
+
+#show-confirm-pass{
+    height: 10%;
+    margin-top: -1.5vh;
+    margin-right: -1vh;
+}
+
+#new-eye{
+    height: 3vh;
+    width: 3vh;
+}
+
+#confirm-eye{
+    height: 3vh;
+    width: 3vh;
+}

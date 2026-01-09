@@ -1,5 +1,3 @@
-// Add to Cart functionality - add-to-cart.js (Updated with navbar badge support)
-
 $(document).ready(function() {
     const csrfToken = $('meta[name="_csrf"]').attr('content');
     const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
@@ -37,34 +35,29 @@ $(document).ready(function() {
         }, 3000);
     }
 
-    // Update navbar cart display
+    // Update navbar cart display with INLINE badges
     function updateNavbarCart(cartSummary) {
         if (cartSummary) {
             const itemCount = cartSummary.itemCount || 0;
-            const totalValue = cartSummary.totalValue || 0;
 
-            // Update cart text
-            $('.cart.for-buy .cart-count').text(itemCount);
-            $('.cart.for-buy .cart-total').text(totalValue.toFixed(2));
-
-            // Update top navbar badge
-            const $topBadge = $('.cart.for-buy .cart-badge');
+            // Update top navbar inline count
+            const $topInlineCount = $('.cart.for-buy .inline-count.cart-count');
             if (itemCount > 0) {
-                if ($topBadge.length === 0) {
-                    $('.cart.for-buy').append(`<span class="count-badge cart-badge">${itemCount}</span>`);
+                if ($topInlineCount.length === 0) {
+                    $('.cart.for-buy').append(`<span class="inline-count cart-count">${itemCount}</span>`);
                 } else {
-                    $topBadge.text(itemCount).addClass('updated');
-                    setTimeout(() => $topBadge.removeClass('updated'), 400);
+                    $topInlineCount.text(itemCount).addClass('updated');
+                    setTimeout(() => $topInlineCount.removeClass('updated'), 500);
                 }
             } else {
-                $topBadge.remove();
+                $topInlineCount.remove();
             }
 
-            // Update navigation menu badge
-            const $navBadge = $('.menu-list .nav-link .nav-count-badge');
-            $('.menu-list a[href="/cart"]').find('.nav-count-badge').remove();
+            // Update navigation menu inline count
+            const $navLink = $('.menu-list a[href="/cart"]');
+            $navLink.find('.nav-inline-count').remove();
             if (itemCount > 0) {
-                $('.menu-list a[href="/cart"]').append(`<span class="nav-count-badge">${itemCount}</span>`);
+                $navLink.append(`<span class="nav-inline-count">${itemCount}</span>`);
             }
         }
     }
@@ -77,13 +70,34 @@ $(document).ready(function() {
         const $button = $(this);
         const $productItem = $button.closest('.product-item, .wishlist-item');
 
-        // Try to get book ID from wishlist button first, then from remove button
-        let bookId = $productItem.find('.wishlist-btn').data('book-id');
+        // Try multiple ways to get book ID
+        let bookId = null;
+
+        // Method 1: From wishlist button (all-books page)
+        bookId = $productItem.find('.wishlist-btn').data('book-id');
+
+        // Method 2: From remove-wishlist button (wishlist page)
         if (!bookId) {
             bookId = $productItem.find('.remove-wishlist-btn').data('book-id');
         }
 
+        // Method 3: From parent wishlist-item data attribute (wishlist page)
         if (!bookId) {
+            bookId = $productItem.attr('data-book-id');
+        }
+
+        // Method 4: From closest element with data-book-id
+        if (!bookId) {
+            const $parent = $button.closest('[data-book-id]');
+            if ($parent.length > 0) {
+                bookId = $parent.data('book-id');
+            }
+        }
+
+        console.log('Cart button clicked, Book ID:', bookId);
+
+        if (!bookId) {
+            console.error('ERROR: No book ID found!');
             showToast('Error: Book ID not found', true);
             return;
         }
@@ -102,6 +116,8 @@ $(document).ready(function() {
                 bookId: bookId
             },
             success: function(response) {
+                console.log('Add to cart response:', response);
+
                 if (response.success) {
                     showToast(response.message);
 
@@ -116,11 +132,13 @@ $(document).ready(function() {
                         $button.removeClass('added');
                     }, 1000);
                 } else {
-                    // Book already in cart
-                    showToast(response.message || 'Failed to add to cart', response.action === 'duplicate');
+                    // Book already in cart or other error
+                    const isDuplicate = response.action === 'duplicate';
+                    showToast(response.message || 'Failed to add to cart', isDuplicate ? false : true);
                 }
             },
             error: function(xhr) {
+                console.error('Add to cart error:', xhr);
                 const message = xhr.responseJSON?.message || 'Error adding to cart';
                 showToast(message, true);
             },

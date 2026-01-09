@@ -9,6 +9,7 @@ public class UpdateUserForm {
     // Email is not included since it's unchangeable
     private String mobile;
     private String address;
+    private String currentPassword;
     private String password;
     private MultipartFile imageFile;
 
@@ -23,6 +24,25 @@ public class UpdateUserForm {
         this.address = address;
         this.password = password;
         this.imageFile = imageFile;
+    }
+
+    public UpdateUserForm(String id, String first_name, String last_name, String mobile, String address, String currentPassword, String password, MultipartFile imageFile) {
+        this.id = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.mobile = mobile;
+        this.address = address;
+        this.currentPassword = currentPassword;
+        this.password = password;
+        this.imageFile = imageFile;
+    }
+
+    public String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
     }
 
     public String getId() {

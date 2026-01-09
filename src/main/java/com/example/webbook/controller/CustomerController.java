@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -78,7 +77,7 @@ public class CustomerController {
             updateUserForm.setId(currentUser.getId().toString());
 
             // Update user
-            User updatedUser = userService.updateUser(updateUserForm);
+            User updatedUser = userService.updateProfile(updateUserForm);
 
             // Return success response with updated user data
             Map<String, Object> response = new HashMap<>();
