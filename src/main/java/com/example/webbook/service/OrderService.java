@@ -1,6 +1,7 @@
 package com.example.webbook.service;
 
 import com.example.webbook.dto.CartItem;
+import com.example.webbook.dto.OrderInfo;
 import com.example.webbook.dto.PaymentResult;
 import com.example.webbook.model.Book;
 import com.example.webbook.model.Order;
@@ -13,9 +14,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,10 +69,47 @@ public class OrderService {
     }
 
     /**
-     * Get all orders for a user
+     * Get all orders for a user as DTOs
      */
-    public List<Order> getUserOrders(UUID userId) {
-        return orderRepository.findByUserId(userId);
+    public List<OrderInfo> getUserOrders(UUID userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream()
+                .map(this::convertToOrderDetail)
+                .collect(Collectors.toList());
+    }
+
+    private OrderInfo convertToOrderDetail(Order order) {
+        OrderInfo dto = new OrderInfo();
+        dto.setOrderId(order.getId().toString());
+        dto.setPaypalOrderId(order.getPaypalOrderId());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setCurrency(order.getCurrency());
+        dto.setStatus(order.getStatus());
+        dto.setPayerName(order.getPayerName());
+        dto.setPayerEmail(order.getPayerEmail());
+
+        // Format created date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
+        dto.setCreatedAt(order.getCreatedAt().format(formatter));
+
+        // Convert books
+        List<OrderInfo.OrderBook> bookDTOs = order.getBooks().stream()
+                .map(book -> {
+                    OrderInfo.OrderBook bookDTO = new OrderInfo.OrderBook();
+                    bookDTO.setBookId(book.getId().toString());
+                    bookDTO.setTitle(book.getTitle());
+                    bookDTO.setImage(book.getImage());
+                    bookDTO.setPrice(book.getPrice());
+                    bookDTO.setAuthorName(book.getAuthor() != null ? book.getAuthor().getName() : "Unknown");
+                    bookDTO.setCategoryName(book.getCategory() != null ? book.getCategory().getName() : "Unknown");
+                    return bookDTO;
+                })
+                .collect(Collectors.toList());
+
+        dto.setBooks(bookDTOs);
+        dto.setBookCount(bookDTOs.size());
+
+        return dto;
     }
 
     /**
@@ -109,5 +146,21 @@ public class OrderService {
         } catch (Exception e) {
             System.out.println("Failed to send order confirmation email" + e);
         }
+    }
+
+    /**
+     * Get all purchased books for a user
+     */
+    public Set<Book> getPurchasedBooks(UUID userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+
+        Set<Book> purchasedBooks = new HashSet<>();
+        for (Order order : orders) {
+            if ("COMPLETED".equals(order.getStatus())) {
+                purchasedBooks.addAll(order.getBooks());
+            }
+        }
+
+        return purchasedBooks;
     }
 }

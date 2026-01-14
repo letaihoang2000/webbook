@@ -4,120 +4,100 @@
     <meta charset="UTF-8">
 </head>
 <body>
-<!-- Payment Method Selection Modal -->
 <div th:fragment="paymentMethodModal">
     <!-- Payment Method Modal -->
-    <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="paymentMethodModalLabel">
-                        <i class="icon icon-credit-card"></i> Select Payment Method
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient border-0 pb-4">
+                    <div>
+                        <h4 class="modal-title mb-1">
+                            <i class="icon icon-credit-card me-2"></i>Secure Checkout
+                        </h4>
+                        <small class="text-muted">Select your payment method</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <!-- Order Summary -->
-                    <div class="payment-summary mb-4">
-                        <h6>Order Summary</h6>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Items:</span>
-                            <span id="modal-item-count">0</span>
+
+                <div class="modal-body p-4">
+                    <!-- Order Summary Card -->
+                    <div class="order-summary-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0"><i class="icon icon-list me-2"></i>Order Summary</h5>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>$<span id="modal-subtotal">0.00</span></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax (10%):</span>
-                            <span>$<span id="modal-tax">0.00</span></span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between fw-bold">
-                            <span>Total:</span>
-                            <span class="text-success">$<span id="modal-total">0.00</span></span>
+
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span class="text-muted">Items</span>
+                                <span class="fw-semibold" id="modal-item-count">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="text-muted">Subtotal</span>
+                                <span class="fw-semibold">$<span id="modal-subtotal">0.00</span></span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="text-muted">Tax (10%)</span>
+                                <span class="fw-semibold">$<span id="modal-tax">0.00</span></span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="summary-row summary-total">
+                                <span class="fw-bold">Total Amount</span>
+                                <span class="text-success fw-bold fs-5">$<span id="modal-total">0.00</span></span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Payment Methods -->
-                    <div class="payment-methods">
-                        <h6 class="mb-3">Choose Payment Method:</h6>
+                    <!-- Payment Method -->
+                    <div class="payment-methods-section">
+                        <h6 class="mb-3 fw-semibold">
+                            <i class="icon icon-wallet me-2"></i>Payment Method
+                        </h6>
 
                         <!-- PayPal Option -->
-                        <div class="payment-option" id="paypal-option">
+                        <div class="payment-option-card active" id="paypal-option">
                             <input type="radio" name="paymentMethod" id="paypal-radio" value="paypal" checked>
-                            <label for="paypal-radio" class="payment-label">
-                                <div class="payment-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="30" height="30">
-                                        <path fill="#003087" d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4 .7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9 .7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/>
-                                    </svg>
-                                </div>
-                                <div class="payment-details">
-                                    <strong>PayPal</strong>
-                                    <small class="text-muted d-block">Pay securely with your PayPal account</small>
-                                </div>
-                                <i class="icon icon-check-circle text-success" style="margin-left: auto;"></i>
-                            </label>
-                        </div>
-
-                        <!-- Future payment methods can be added here -->
-                        <!-- Credit Card (Coming Soon) -->
-                        <div class="payment-option disabled">
-                            <input type="radio" name="paymentMethod" id="card-radio" value="card" disabled>
-                            <label for="card-radio" class="payment-label">
-                                <div class="payment-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="30" height="30">
-                                        <path fill="#999" d="M512 80c8.8 0 16 7.2 16 16v32H48V96c0-8.8 7.2-16 16-16H512zm16 144V416c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V224H528zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm56 304c-13.3 0-24 10.7-24 24s10.7 24 24 24h48c13.3 0 24-10.7 24-24s-10.7-24-24-24H120zm128 0c-13.3 0-24 10.7-24 24s10.7 24 24 24H360c13.3 0 24-10.7 24-24s-10.7-24-24-24H248z"/>
-                                    </svg>
-                                </div>
-                                <div class="payment-details">
-                                    <strong>Credit / Debit Card</strong>
-                                    <small class="text-muted d-block">Coming Soon</small>
+                            <label for="paypal-radio" class="payment-option-label">
+                                <div class="payment-method-content">
+                                    <div class="payment-icon-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="40" height="40">
+                                            <path fill="#003087" d="M111.4 295.9c-3.5 19.2-17.4 108.7-21.5 134-.3 1.8-1 2.5-3 2.5H12.3c-7.6 0-13.1-6.6-12.1-13.9L58.8 46.6c1.5-9.6 10.1-16.9 20-16.9 152.3 0 165.1-3.7 204 11.4 60.1 23.3 65.6 79.5 44 140.3-21.5 62.6-72.5 89.5-140.1 90.3-43.4 .7-69.5-7-75.3 24.2zM357.1 152c-1.8-1.3-2.5-1.8-3 1.3-2 11.4-5.1 22.5-8.8 33.6-39.9 113.8-150.5 103.9-204.5 103.9-6.1 0-10.1 3.3-10.9 9.4-22.6 140.4-27.1 169.7-27.1 169.7-1 7.1 3.5 12.9 10.6 12.9h63.5c8.6 0 15.7-6.3 17.4-14.9 .7-5.4-1.1 6.1 14.4-91.3 4.6-22 14.3-19.7 29.3-19.7 71 0 126.4-28.8 142.9-112.3 6.5-34.8 4.6-71.4-23.8-92.6z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="payment-details-content">
+                                        <div class="payment-method-name">PayPal</div>
+                                        <small class="payment-method-desc">Safe and secure payment</small>
+                                    </div>
+                                    <div class="check-indicator">
+                                        <i class="icon icon-check-circle"></i>
+                                    </div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Security Note -->
-                    <div class="alert alert-info mt-3">
-                        <i class="icon icon-lock"></i> Your payment information is encrypted and secure
+                    <!-- Security Badge -->
+                    <div class="security-badge mt-4">
+                        <div class="d-flex align-items-center">
+                            <div class="security-icon me-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="24" height="24" fill="#28a745">
+                                    <path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Secure Payment</strong>
+                                <p class="mb-0 small text-muted">Your payment information is encrypted and secure</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="confirm-payment-btn">
-                        <i class="icon icon-check"></i> Continue to Payment
+
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal">
+                        <i class="icon icon-close me-2"></i>Cancel
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Success Modal -->
-    <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-labelledby="paymentSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center py-5">
-                    <div class="success-icon mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="80" height="80" fill="#28a745">
-                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-success mb-3">Payment Successful!</h3>
-                    <p class="text-muted mb-4">Your order has been confirmed.</p>
-                    <div class="order-info mb-4">
-                        <p><strong>Order ID:</strong> <span id="success-order-id">-</span></p>
-                        <p><strong>Total Amount:</strong> $<span id="success-amount">0.00</span></p>
-                    </div>
-                    <p class="small text-muted">A confirmation email has been sent to your email address.</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <a href="/customer/my-books" class="btn btn-accent btn-lg">
-                        <i class="icon icon-book"></i> View My Books
-                    </a>
-                    <a href="/customer/all-books" class="btn btn-outline-secondary btn-lg">
-                        <i class="icon icon-search"></i> Browse More Books
-                    </a>
+                    <button type="button" class="btn btn-primary btn-lg px-5" id="confirm-payment-btn">
+                        <i class="icon icon-check me-2"></i>Continue to PayPal
+                    </button>
                 </div>
             </div>
         </div>
@@ -125,72 +105,145 @@
 </div>
 
 <style>
-    .payment-option {
-        border: 2px solid #e0e0e0;
+    /* Modal Header Gradient */
+    .bg-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    /* Order Summary Card */
+    .order-summary-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .summary-details {
+        background: white;
         border-radius: 8px;
         padding: 15px;
-        margin-bottom: 15px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+    }
+
+    .summary-total {
+        padding-top: 12px;
+        font-size: 1.1em;
+    }
+
+    /* Payment Option Card */
+    .payment-option-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
         cursor: pointer;
         transition: all 0.3s ease;
+        background: white;
     }
 
-    .payment-option:hover:not(.disabled) {
-        border-color: #704214;
-        background-color: #f8f9fa;
+    .payment-option-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
     }
 
-    .payment-option.disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+    .payment-option-card.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
-    .payment-option input[type="radio"] {
+    .payment-option-card input[type="radio"] {
         display: none;
     }
 
-    .payment-option input[type="radio"]:checked + .payment-label {
-        font-weight: bold;
-    }
-
-    .payment-option input[type="radio"]:checked ~ .payment-label,
-    .payment-option:has(input[type="radio"]:checked) {
-        border-color: #704214;
-        background-color: #fff5e6;
-    }
-
-    .payment-label {
-        display: flex;
-        align-items: center;
+    .payment-option-label {
         cursor: pointer;
         margin: 0;
         width: 100%;
     }
 
-    .payment-icon {
-        margin-right: 15px;
+    .payment-method-content {
         display: flex;
         align-items: center;
+        gap: 20px;
     }
 
-    .payment-details {
+    .payment-icon-wrapper {
+        background: white;
+        padding: 12px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-details-content {
         flex: 1;
     }
 
-    .payment-summary {
-        background-color: #f8f9fa;
-        padding: 15px;
+    .payment-method-name {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 4px;
+    }
+
+    .payment-method-desc {
+        color: #718096;
+    }
+
+    .check-indicator {
+        color: #28a745;
+        font-size: 1.5em;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .payment-option-card.active .check-indicator {
+        opacity: 1;
+    }
+
+    /* Security Badge */
+    .security-badge {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
         border-radius: 8px;
+        padding: 15px;
     }
 
-    .success-icon {
-        animation: scaleIn 0.5s ease-in-out;
+    .security-icon {
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
-    @keyframes scaleIn {
-        from { transform: scale(0); }
-        to { transform: scale(1); }
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border-width: 2px;
+        font-weight: 600;
+    }
+
+    /* Modal Size */
+    .modal-lg {
+        max-width: 600px;
     }
 </style>
-</div>
 </body>
 </html>

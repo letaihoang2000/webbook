@@ -1,6 +1,7 @@
 package com.example.webbook.controller;
 
 import com.example.webbook.dto.BookInfo;
+import com.example.webbook.dto.OrderInfo;
 import com.example.webbook.dto.UpdateUserForm;
 import com.example.webbook.model.Book;
 import com.example.webbook.model.Order;
@@ -189,20 +190,18 @@ public class CustomerController {
     }
 
     @GetMapping("/my-books")
-    public String myBooks(Model model, Authentication authentication) {
+    public String myBooks(
+            @RequestParam(required = false) String payment,
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String amount,
+            Model model,
+            Authentication authentication) {
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
 
-        // Get user's purchased books from orders
-        List<Order> userOrders = orderService.getUserOrders(user.getId());
-
-        // Extract all unique books from completed orders
-        Set<Book> purchasedBooks = new HashSet<>();
-        for (Order order : userOrders) {
-            if ("COMPLETED".equals(order.getStatus())) {
-                purchasedBooks.addAll(order.getBooks());
-            }
-        }
+        // Get purchased books directly
+        Set<Book> purchasedBooks = orderService.getPurchasedBooks(user.getId());
 
         Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
         long wishlistCount = wishlistService.getWishlistBookIds(user.getId()).size();
@@ -211,6 +210,13 @@ public class CustomerController {
         model.addAttribute("currentUser", user);
         model.addAttribute("cartSummary", cartSummary);
         model.addAttribute("wishlistCount", wishlistCount);
+
+        // Add payment status for modal
+        if (payment != null) {
+            model.addAttribute("paymentStatus", payment);
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("orderAmount", amount);
+        }
 
         return "users/customer/my_books";
     }
