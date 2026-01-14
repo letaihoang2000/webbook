@@ -66,6 +66,9 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/webjars/**").permitAll()
                         .requestMatchers("/login", "/register", "/", "/403").permitAll()
 
+                        .requestMatchers("/payment/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/webhook/paypal").permitAll()
+
                         // Admin only access
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/category/**").hasRole("ADMIN")
@@ -115,7 +118,8 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/admin/**", "/category/**", "/author/**",
-                                "/book/**", "/logout", "/wishlist/**","/cart/**")
+                                "/book/**", "/logout", "/wishlist/**",
+                                "/cart/**","/webhook/paypal","/payment/**")
                 );
 
         return http.build();
