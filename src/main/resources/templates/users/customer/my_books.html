@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Books - BookSaw</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/normalize.css}">
+    <link rel="stylesheet" th:href="@{/icomoon/icomoon.css}">
+    <link rel="stylesheet" th:href="@{/css/vendor.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/home.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/customer/navbar-badges.css}">
+</head>
+
+<body>
+
+<!-- Include Navbar Fragment -->
+<div th:replace="~{fragments/customer_navbar :: navbar}"></div>
+
+<!-- Page Header -->
+<section id="my-books-header" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section-header align-center">
+                    <div class="title">
+                        <span>Your Library</span>
+                    </div>
+                    <h2 class="section-title">My Books</h2>
+                    <p class="results-info" th:if="${!purchasedBooks.isEmpty()}">
+                        You own <strong th:text="${purchasedBooks.size()}">0</strong>
+                        <span th:text="${purchasedBooks.size() == 1} ? 'book' : 'books'">books</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- My Books Grid -->
+<section id="my-books-grid" class="bookshelf py-5 my-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Books Grid -->
+                <div class="product-list" th:if="${!purchasedBooks.isEmpty()}">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-4" th:each="book : ${purchasedBooks}">
+                            <div class="product-item">
+                                <figure class="product-style">
+                                    <img th:src="${book.image}"
+                                         th:alt="${book.title}"
+                                         class="product-item">
+
+                                    <!-- Read Button Overlay -->
+                                    <div class="product-actions">
+                                        <a th:href="@{/customer/read/{id}(id=${book.id})}"
+                                           class="action-btn read-btn"
+                                           title="Read Book">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="24" height="24" fill="#fff">
+                                                <path d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5V78.6c0-4.2-1.6-8.4-5-11C247.4 52 202.4 32 144 32C93.5 32 46.3 45.3 18.1 56.1C6.8 60.5 0 71.7 0 83.8V454.1c0 11.9 12.8 20.2 24.1 16.5C55.6 460.1 105.5 448 144 448c33.9 0 79 14 105.6 23.5zm76.8 0C353 462 398.1 448 432 448c38.5 0 88.4 12.1 119.9 22.6c11.3 3.8 24.1-4.6 24.1-16.5V83.8c0-12.1-6.8-23.3-18.1-27.6C529.7 45.3 482.5 32 432 32c-58.4 0-103.4 20-123 35.6c-3.3 2.6-5 6.8-5 11V456c0 11.4 11.7 19.3 22.4 15.5z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </figure>
+                                <figcaption>
+                                    <div class="item-category" th:text="${book.category?.name}">Category</div>
+                                    <h3 class="item-title">
+                                        <a th:href="@{/customer/read/{id}(id=${book.id})}"
+                                           th:text="${book.title}">Book Title</a>
+                                    </h3>
+                                    <span class="item-author" th:text="${book.author?.name}">Author Name</span>
+                                    <div class="item-status text-success">
+                                        <i class="icon icon-check-circle"></i> Purchased
+                                    </div>
+                                </figcaption>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-library text-center py-5" th:if="${purchasedBooks.isEmpty()}">
+                    <i class="icon icon-book" style="font-size: 5rem; color: #ccc;"></i>
+                    <h3 class="mt-4">Your library is empty</h3>
+                    <p class="text-muted mb-4">Start building your digital library today!</p>
+                    <a th:href="@{/customer/all-books}" class="btn btn-accent btn-lg">
+                        <i class="icon icon-search"></i> Browse Books
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <p>© 2024 BookSaw. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div th:replace="~{modals/customer/signout :: logoutModal}"></div>
+
+<script th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/plugins.js}"></script>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/customer/signout.js}"></script>
+
+</body>
+</html>

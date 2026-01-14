@@ -75,29 +75,22 @@ public class PaymentController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
 
-            // Capture the payment
             PaymentResult result = payPalService.captureOrder(orderId);
 
             if (result.isSuccess()) {
-                // Create order record
                 Order order = orderService.createOrderFromCart(user.getId(), result);
-
-                // Send confirmation email
                 orderService.sendOrderConfirmation(order);
-
-                // Clear cart
                 cartService.clearCart(user.getId());
 
-                model.addAttribute("order", order);
-                model.addAttribute("paymentResult", result);
-                return "payment/success";
-
+                // Redirect to cart with success parameters
+                return "redirect:/cart?payment=success&orderId=" + order.getId() + "&amount=" + order.getTotalAmount();
             } else {
-                return "redirect:/payment/error?reason=capture_failed";
+                return "redirect:/cart?payment=failed";
             }
 
         } catch (Exception e) {
-            return "redirect:/payment/error?reason=processing_error";
+            System.out.println("Error processing payment" + e);
+            return "redirect:/cart?payment=error";
         }
     }
 

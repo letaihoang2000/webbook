@@ -139,7 +139,8 @@
                         <button type="button"
                                 class="btn btn-accent btn-lg w-100 mt-4"
                                 id="checkout-btn"
-                                onclick="window.location.href='/cart/checkout'">
+                                data-bs-toggle="modal"
+                                data-bs-target="#paymentMethodModal">
                             <i class="icon icon-check"></i> Proceed to Checkout
                         </button>
 
@@ -220,6 +221,8 @@
     </div>
 
     <div th:replace="~{modals/customer/signout :: logoutModal}"></div>
+    <div th:replace="~{modals/customer/payment_method :: paymentMethodModal}"></div>
+
 
     <!-- Toast Notification -->
     <div id="cart-toast" class="cart-toast">
@@ -233,6 +236,7 @@
     <script th:src="@{/js/script.js}"></script>
     <script th:src="@{/js/customer/signout.js}"></script>
     <script th:src="@{/js/customer/cart.js}"></script>
+    <script th:src="@{/js/customer/payment.js}"></script>
 
     </body>
     </html>

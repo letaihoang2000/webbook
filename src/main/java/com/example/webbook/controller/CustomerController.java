@@ -2,6 +2,8 @@ package com.example.webbook.controller;
 
 import com.example.webbook.dto.BookInfo;
 import com.example.webbook.dto.UpdateUserForm;
+import com.example.webbook.model.Book;
+import com.example.webbook.model.Order;
 import com.example.webbook.model.User;
 import com.example.webbook.security.CustomUserDetails;
 import com.example.webbook.service.*;
@@ -32,6 +34,9 @@ public class CustomerController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/home")
     public String customerHome(Model model, Authentication authentication) {
@@ -181,5 +186,32 @@ public class CustomerController {
             model.addAttribute("error", "Book not found");
             return "redirect:/customer/all-books";
         }
+    }
+
+    @GetMapping("/my-books")
+    public String myBooks(Model model, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        // Get user's purchased books from orders
+        List<Order> userOrders = orderService.getUserOrders(user.getId());
+
+        // Extract all unique books from completed orders
+        Set<Book> purchasedBooks = new HashSet<>();
+        for (Order order : userOrders) {
+            if ("COMPLETED".equals(order.getStatus())) {
+                purchasedBooks.addAll(order.getBooks());
+            }
+        }
+
+        Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
+        long wishlistCount = wishlistService.getWishlistBookIds(user.getId()).size();
+
+        model.addAttribute("purchasedBooks", purchasedBooks);
+        model.addAttribute("currentUser", user);
+        model.addAttribute("cartSummary", cartSummary);
+        model.addAttribute("wishlistCount", wishlistCount);
+
+        return "users/customer/my_books";
     }
 }

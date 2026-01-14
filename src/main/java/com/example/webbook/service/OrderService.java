@@ -69,6 +69,13 @@ public class OrderService {
     }
 
     /**
+     * Get all orders for a user
+     */
+    public List<Order> getUserOrders(UUID userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    /**
      * Send order confirmation email
      */
     public void sendOrderConfirmation(Order order) {
