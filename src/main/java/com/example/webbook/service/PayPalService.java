@@ -1,6 +1,7 @@
 package com.example.webbook.service;
 
 import com.example.webbook.dto.PaymentResult;
+import com.example.webbook.model.User;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
 import com.paypal.orders.*;
@@ -20,13 +21,16 @@ public class PayPalService {
     @Autowired
     private PayPalHttpClient payPalClient;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${app.base-url}")
     private String baseUrl;
 
     /**
-     * Create PayPal order
+     * Create PayPal order with pre-populated user information
      */
-    public String createOrder(UUID userId, double total, String currency) {
+    public String createOrder(User user, double total, String currency) {
         try {
             OrderRequest orderRequest = new OrderRequest();
             orderRequest.checkoutPaymentIntent("CAPTURE");
@@ -36,21 +40,50 @@ public class PayPalService {
                     .currencyCode(currency)
                     .value(String.format("%.2f", total));
 
-            // Purchase unit
+            // Purchase unit with user reference
             PurchaseUnitRequest purchaseUnit = new PurchaseUnitRequest()
-                    .referenceId(userId.toString()) // Store user ID for later
+                    .referenceId(user.getId().toString()) // Store user ID for later
                     .amountWithBreakdown(amount)
-                    .description("BookSaw - Online Book Purchase");
+                    .description("BookSaw - Online Book Purchase")
+                    .customId(user.getEmail()); // Store email as custom reference
 
             orderRequest.purchaseUnits(Arrays.asList(purchaseUnit));
 
-            // Return URLs - using your Railway domain
+            // PRE-POPULATE payer information from user data
+            Payer payer = new Payer();
+
+            // Use stored PayPal email if available, otherwise use user's email
+            String emailToUse = (user.getPaypalEmail() != null && !user.getPaypalEmail().trim().isEmpty())
+                    ? user.getPaypalEmail()
+                    : user.getEmail();
+            payer.email(emailToUse);
+
+            // Set name
+            Name payerName = new Name()
+                    .givenName(user.getFirst_name())
+                    .surname(user.getLast_name());
+            payer.name(payerName);
+
+            // Set phone if available
+            if (user.getMobile() != null && !user.getMobile().trim().isEmpty()) {
+                // Clean phone number (remove spaces, dashes, parentheses)
+                String cleanPhone = user.getMobile().replaceAll("[\\s\\-\\(\\)]", "");
+
+                PhoneWithType phone = new PhoneWithType()
+                        .phoneNumber(new Phone().nationalNumber(cleanPhone));
+                payer.phoneWithType(phone);
+            }
+
+            orderRequest.payer(payer);
+
+            // Application context - Return URLs
             ApplicationContext appContext = new ApplicationContext()
                     .returnUrl(baseUrl + "/payment/success")
                     .cancelUrl(baseUrl + "/payment/cancel")
                     .brandName("BookSaw")
                     .landingPage("BILLING")
-                    .shippingPreference("NO_SHIPPING"); // Digital products
+                    .shippingPreference("NO_SHIPPING") // Digital products
+                    .userAction("PAY_NOW"); // Shows "Pay Now" instead of "Continue"
 
             orderRequest.applicationContext(appContext);
 
@@ -74,7 +107,7 @@ public class PayPalService {
     }
 
     /**
-     * Capture payment (called when user returns from PayPal)
+     * Capture payment and sync payer information back to user
      */
     public PaymentResult captureOrder(String orderId) {
         try {
@@ -87,11 +120,33 @@ public class PayPalService {
             result.setStatus(order.status());
             result.setSuccess("COMPLETED".equals(order.status()));
 
-            // Extract payer info
-            if (order.payer() != null && order.payer().name() != null) {
-                result.setPayerName(order.payer().name().givenName() + " " +
-                        order.payer().name().surname());
-                result.setPayerEmail(order.payer().email());
+            // Extract payer information
+            if (order.payer() != null) {
+                String paypalPayerId = order.payer().payerId();
+                String paypalEmail = order.payer().email();
+
+                result.setPayerPayerId(paypalPayerId);
+                result.setPayerEmail(paypalEmail);
+
+                if (order.payer().name() != null) {
+                    String firstName = order.payer().name().givenName();
+                    String lastName = order.payer().name().surname();
+                    result.setPayerName(firstName + " " + lastName);
+                }
+
+                // Get user ID from purchase unit reference and sync PayPal info
+                if (order.purchaseUnits() != null && !order.purchaseUnits().isEmpty()) {
+                    String userIdStr = order.purchaseUnits().get(0).referenceId();
+                    try {
+                        UUID userId = UUID.fromString(userIdStr);
+
+                        // Sync PayPal info back to user profile
+                        userService.updatePayPalInfo(userId, paypalPayerId, paypalEmail);
+                    } catch (Exception e) {
+                        System.out.println("Could not sync PayPal info for user: {}" + userIdStr + e);
+                        // Don't fail the payment if sync fails
+                    }
+                }
             }
 
             // Extract amount

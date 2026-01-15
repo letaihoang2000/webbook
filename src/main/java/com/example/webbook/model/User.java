@@ -23,6 +23,13 @@ public class User {
     private String password;
     private String mobile;
     private String address;
+
+    @Column(name = "paypal_email")
+    private String paypalEmail;
+
+    @Column(name = "paypal_payer_id")
+    private String paypalPayerId;
+
     private LocalDateTime created_at;
     private LocalDateTime last_updated;
 
@@ -108,6 +115,22 @@ public class User {
 
     public void setLast_name(String last_name) {
         this.last_name = last_name;
+    }
+
+    public String getPaypalEmail() {
+        return paypalEmail;
+    }
+
+    public void setPaypalEmail(String paypalEmail) {
+        this.paypalEmail = paypalEmail;
+    }
+
+    public String getPaypalPayerId() {
+        return paypalPayerId;
+    }
+
+    public void setPaypalPayerId(String paypalPayerId) {
+        this.paypalPayerId = paypalPayerId;
     }
 
     public UUID getId() {

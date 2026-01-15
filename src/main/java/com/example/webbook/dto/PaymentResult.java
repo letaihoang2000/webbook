@@ -4,6 +4,7 @@ public class PaymentResult {
     private String orderId;
     private String status;
     private boolean success;
+    private String payerPayerId;
     private String payerName;
     private String payerEmail;
     private double amount;
@@ -12,10 +13,11 @@ public class PaymentResult {
     public PaymentResult() {
     }
 
-    public PaymentResult(String orderId, String status, boolean success, String payerName, String payerEmail, double amount, String currency) {
+    public PaymentResult(String orderId, String status, boolean success, String payerPayerId, String payerName, String payerEmail, double amount, String currency) {
         this.orderId = orderId;
         this.status = status;
         this.success = success;
+        this.payerPayerId = payerPayerId;
         this.payerName = payerName;
         this.payerEmail = payerEmail;
         this.amount = amount;
@@ -44,6 +46,14 @@ public class PaymentResult {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public String getPayerPayerId() {
+        return payerPayerId;
+    }
+
+    public void setPayerPayerId(String payerPayerId) {
+        this.payerPayerId = payerPayerId;
     }
 
     public String getPayerName() {

@@ -8,6 +8,7 @@ import com.example.webbook.exception.EmailAlreadyExistsException;
 import com.example.webbook.model.Role;
 import com.example.webbook.repository.RoleRepository;
 import com.example.webbook.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -197,7 +198,6 @@ public class UserService {
             user.setMobile(addUserForm.getMobile());
             user.setAddress(addUserForm.getAddress());
             user.setPassword(passwordEncoder.encode(addUserForm.getPassword()));
-            user.setPassword(addUserForm.getPassword());
 
             user.setRole(userRole);
 
@@ -344,6 +344,41 @@ public class UserService {
             throw new RuntimeException("Invalid user ID format: " + userId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete user: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user's PayPal information after successful payment
+     * This syncs the PayPal account used for payment with the user's profile
+     */
+    @Transactional
+    public void updatePayPalInfo(UUID userId, String paypalPayerId, String paypalEmail) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Only update if PayPal info is different or not set
+            boolean needsUpdate = false;
+
+            if (paypalPayerId != null && !paypalPayerId.equals(user.getPaypalPayerId())) {
+                user.setPaypalPayerId(paypalPayerId);
+                needsUpdate = true;
+            }
+
+            if (paypalEmail != null && !paypalEmail.equals(user.getPaypalEmail())) {
+                user.setPaypalEmail(paypalEmail);
+                needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+                user.setLast_updated(LocalDateTime.now());
+                userRepository.save(user);
+                System.out.println("Updated PayPal info for user: " + userId);
+            }
+
+        } catch (Exception e) {
+            // Log the error but don't throw - this is not critical for payment success
+            System.err.println("Failed to update PayPal info for user: " + userId + " - " + e.getMessage());
         }
     }
 }

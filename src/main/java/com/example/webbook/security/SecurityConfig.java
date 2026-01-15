@@ -65,7 +65,7 @@ public class SecurityConfig {
                         // Public resources
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**", "/webjars/**").permitAll()
                         .requestMatchers("/login", "/register", "/", "/403").permitAll()
-
+                        .requestMatchers("/book/purchase/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/payment/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/webhook/paypal").permitAll()
 

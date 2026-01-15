@@ -25,6 +25,9 @@ public class Order {
     @Column(name = "paypal_order_id", unique = true)
     private String paypalOrderId;
 
+    @Column(name = "paypal_payer_id")
+    private String paypalPayerId;
+
     @Column(name = "total_amount", nullable = false)
     private double totalAmount;
 
@@ -84,6 +87,14 @@ public class Order {
 
     public void setPaypalOrderId(String paypalOrderId) {
         this.paypalOrderId = paypalOrderId;
+    }
+
+    public String getPaypalPayerId() {
+        return paypalPayerId;
+    }
+
+    public void setPaypalPayerId(String paypalPayerId) {
+        this.paypalPayerId = paypalPayerId;
     }
 
     public double getTotalAmount() {

@@ -1,7 +1,6 @@
 package com.example.webbook.service;
 
 import com.example.webbook.dto.CartItem;
-import com.example.webbook.dto.OrderInfo;
 import com.example.webbook.dto.PaymentResult;
 import com.example.webbook.model.Book;
 import com.example.webbook.model.Order;
@@ -14,7 +13,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +49,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(userRepository.findById(userId).orElseThrow());
         order.setPaypalOrderId(paymentResult.getOrderId());
+        order.setPaypalPayerId(paymentResult.getPayerPayerId()); // Store PayPal payer ID
         order.setTotalAmount(paymentResult.getAmount());
         order.setCurrency(paymentResult.getCurrency());
         order.setStatus("COMPLETED");
@@ -69,47 +68,31 @@ public class OrderService {
     }
 
     /**
-     * Get all orders for a user as DTOs
+     * Create order from single book purchase
      */
-    public List<OrderInfo> getUserOrders(UUID userId) {
-        List<Order> orders = orderRepository.findByUserId(userId);
-        return orders.stream()
-                .map(this::convertToOrderDetail)
-                .collect(Collectors.toList());
-    }
+    @Transactional
+    public Order createOrderFromSingleBook(UUID userId, UUID bookId, PaymentResult paymentResult) {
+        // Get the book
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
 
-    private OrderInfo convertToOrderDetail(Order order) {
-        OrderInfo dto = new OrderInfo();
-        dto.setOrderId(order.getId().toString());
-        dto.setPaypalOrderId(order.getPaypalOrderId());
-        dto.setTotalAmount(order.getTotalAmount());
-        dto.setCurrency(order.getCurrency());
-        dto.setStatus(order.getStatus());
-        dto.setPayerName(order.getPayerName());
-        dto.setPayerEmail(order.getPayerEmail());
+        // Create order
+        Order order = new Order();
+        order.setUser(userRepository.findById(userId).orElseThrow());
+        order.setPaypalOrderId(paymentResult.getOrderId());
+        order.setPaypalPayerId(paymentResult.getPayerPayerId()); // Store PayPal payer ID
+        order.setTotalAmount(paymentResult.getAmount());
+        order.setCurrency(paymentResult.getCurrency());
+        order.setStatus("COMPLETED");
+        order.setPayerName(paymentResult.getPayerName());
+        order.setPayerEmail(paymentResult.getPayerEmail());
 
-        // Format created date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
-        dto.setCreatedAt(order.getCreatedAt().format(formatter));
+        // Add single book
+        List<Book> books = new ArrayList<>();
+        books.add(book);
+        order.setBooks(books);
 
-        // Convert books
-        List<OrderInfo.OrderBook> bookDTOs = order.getBooks().stream()
-                .map(book -> {
-                    OrderInfo.OrderBook bookDTO = new OrderInfo.OrderBook();
-                    bookDTO.setBookId(book.getId().toString());
-                    bookDTO.setTitle(book.getTitle());
-                    bookDTO.setImage(book.getImage());
-                    bookDTO.setPrice(book.getPrice());
-                    bookDTO.setAuthorName(book.getAuthor() != null ? book.getAuthor().getName() : "Unknown");
-                    bookDTO.setCategoryName(book.getCategory() != null ? book.getCategory().getName() : "Unknown");
-                    return bookDTO;
-                })
-                .collect(Collectors.toList());
-
-        dto.setBooks(bookDTOs);
-        dto.setBookCount(bookDTOs.size());
-
-        return dto;
+        return orderRepository.save(order);
     }
 
     /**
@@ -135,16 +118,16 @@ public class OrderService {
                         .append(String.format("%.2f", book.getPrice())).append(")\n");
             }
 
-            emailBody.append("\n\nYou can access your books at: https://webbook-production-6c11.up.railway.app/customer/library\n\n");
+            emailBody.append("\n\nYou can access your books at: https://webbook-production-6c11.up.railway.app/customer/my-books\n\n");
             emailBody.append("Best regards,\nBookSaw Team");
 
             message.setText(emailBody.toString());
 
             mailSender.send(message);
-            System.out.println("Order confirmation email sent to: {}" + order.getUser().getEmail());
+            System.out.println("Order confirmation email sent to: " + order.getUser().getEmail());
 
         } catch (Exception e) {
-            System.out.println("Failed to send order confirmation email" + e);
+            System.err.println("Failed to send order confirmation email: " + e.getMessage());
         }
     }
 
