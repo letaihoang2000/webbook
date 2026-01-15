@@ -16,12 +16,12 @@ $(document).ready(function() {
     });
 
     // Handle payment method selection
-    $('.payment-option').on('click', function() {
+    $('.payment-option-card').on('click', function() {
         if (!$(this).hasClass('disabled')) {
             const radio = $(this).find('input[type="radio"]');
             radio.prop('checked', true);
-            $('.payment-option').removeClass('selected');
-            $(this).addClass('selected');
+            $('.payment-option-card').removeClass('active');
+            $(this).addClass('active');
         }
     });
 
@@ -54,18 +54,27 @@ $(document).ready(function() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
 
+    console.log('Payment status:', paymentStatus); // DEBUG
+
     if (paymentStatus === 'success') {
         const orderId = urlParams.get('orderId');
         const amount = urlParams.get('amount');
+
+        console.log('Success! Order:', orderId, 'Amount:', amount); // DEBUG
 
         $('#modal-success-order-id').text(orderId || '-');
         $('#modal-success-amount').text(parseFloat(amount || 0).toFixed(2));
 
         // Show success modal
-        $('#paymentSuccessModal').modal('show');
+        const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
+        successModal.show();
 
-        // Clean URL
-        window.history.replaceState({}, document.title, '/cart');
+        console.log('Success modal should be showing'); // DEBUG
+
+        // Clean URL after showing modal
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, '/cart');
+        }, 1000);
 
     } else if (paymentStatus === 'failed') {
         const reason = urlParams.get('reason');
@@ -79,16 +88,27 @@ $(document).ready(function() {
             message = 'A system error occurred. Please try again later.';
         }
 
+        console.log('Failed! Reason:', reason); // DEBUG
+
         $('#failed-reason').text(message);
-        $('#paymentFailedModal').modal('show');
+
+        const failedModal = new bootstrap.Modal(document.getElementById('paymentFailedModal'));
+        failedModal.show();
 
         // Clean URL
-        window.history.replaceState({}, document.title, '/cart');
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, '/cart');
+        }, 1000);
 
     } else if (paymentStatus === 'cancelled') {
-        $('#paymentCancelledModal').modal('show');
+        console.log('Cancelled!'); // DEBUG
+
+        const cancelledModal = new bootstrap.Modal(document.getElementById('paymentCancelledModal'));
+        cancelledModal.show();
 
         // Clean URL
-        window.history.replaceState({}, document.title, '/cart');
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, '/cart');
+        }, 1000);
     }
 });
