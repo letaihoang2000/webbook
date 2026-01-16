@@ -7,12 +7,23 @@
             color: white;
         }
 
-        .modal-logout .modal-header .close {
-            color: white;
-            opacity: 0.8;
+        .modal-logout .modal-title {
+            font-weight: 600;
         }
 
-        .modal-logout .modal-header .close:hover {
+        .modal-logout .btn-close-white {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .modal-logout .btn-close-white:hover {
             opacity: 1;
         }
 
@@ -46,11 +57,11 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="logoutModalLabel">
+                <h5 style="display: content !important; font-size: larger;" class="modal-title" id="logoutModalLabel">
                     <i class="fa fa-sign-out me-2"></i>Confirm Logout
-                </h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                </h5>
+                <button type="button" style="background: grey !important; border-radius: 50%; " class="btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
                 </button>
             </div>
             <div class="modal-body">
@@ -62,10 +73,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <button style="border-radius: 10%;" type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i> Cancel
                 </button>
-                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">
+                <button style="border-radius: 10%;" type="button" class="btn btn-danger" id="confirmLogoutBtn">
                     <i class="fa fa-sign-out me-1"></i> Sign Out
                 </button>
             </div>
@@ -75,7 +86,7 @@
 
 <!-- Hidden logout form -->
 <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">
-    <!-- CSRF token will be automatically included by Thymeleaf -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 </form>
 
 </body>
