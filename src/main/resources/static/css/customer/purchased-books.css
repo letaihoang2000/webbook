@@ -1,0 +1,136 @@
+.action-btn.read-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.action-btn.read-btn:hover {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.action-btn.read-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+/* ===== Purchased Book Indicator ===== */
+
+.item-status {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.item-status.text-success,
+.item-status.purchased {
+    color: #28a745;
+}
+
+.item-status i {
+    margin-right: 5px;
+}
+
+/* ===== Book Detail Purchased State ===== */
+
+.btn-success.btn-lg {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-success.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* ===== Content Access Section ===== */
+
+.content-access {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.content-access .card {
+    border: none;
+}
+
+.content-access .card-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Locked Content Notice ===== */
+
+.content-locked-notice {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.lock-icon {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.content-locked-notice h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.content-locked-notice p {
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+.btn-unlock {
+    background: linear-gradient(135deg, #a26c5a 0%, #8b5a4a 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(162, 108, 90, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-unlock:hover {
+    background: linear-gradient(135deg, #8b5a4a 0%, #a26c5a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(162, 108, 90, 0.4);
+    color: white;
+}
+
+/* ===== Responsive Adjustments ===== */
+
+@media (max-width: 768px) {
+    .content-locked-notice {
+        padding: 30px 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-unlock {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}

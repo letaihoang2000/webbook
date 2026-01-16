@@ -34,6 +34,43 @@ public class OrderService {
     private JavaMailSender mailSender;
 
     /**
+     * Check if user has purchased a specific book
+     */
+    public boolean hasUserPurchasedBook(UUID userId, UUID bookId) {
+        List<Order> userOrders = orderRepository.findByUserId(userId);
+
+        for (Order order : userOrders) {
+            if ("COMPLETED".equals(order.getStatus())) {
+                for (Book book : order.getBooks()) {
+                    if (book.getId().equals(bookId)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all purchased book IDs for a user
+     */
+    public Set<UUID> getPurchasedBookIds(UUID userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        Set<UUID> purchasedBookIds = new HashSet<>();
+
+        for (Order order : orders) {
+            if ("COMPLETED".equals(order.getStatus())) {
+                for (Book book : order.getBooks()) {
+                    purchasedBookIds.add(book.getId());
+                }
+            }
+        }
+
+        return purchasedBookIds;
+    }
+
+    /**
      * Create order from cart
      */
     @Transactional
@@ -49,7 +86,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(userRepository.findById(userId).orElseThrow());
         order.setPaypalOrderId(paymentResult.getOrderId());
-        order.setPaypalPayerId(paymentResult.getPayerPayerId()); // Store PayPal payer ID
+        order.setPaypalPayerId(paymentResult.getPayerPayerId());
         order.setTotalAmount(paymentResult.getAmount());
         order.setCurrency(paymentResult.getCurrency());
         order.setStatus("COMPLETED");
@@ -80,7 +117,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(userRepository.findById(userId).orElseThrow());
         order.setPaypalOrderId(paymentResult.getOrderId());
-        order.setPaypalPayerId(paymentResult.getPayerPayerId()); // Store PayPal payer ID
+        order.setPaypalPayerId(paymentResult.getPayerPayerId());
         order.setTotalAmount(paymentResult.getAmount());
         order.setCurrency(paymentResult.getCurrency());
         order.setStatus("COMPLETED");

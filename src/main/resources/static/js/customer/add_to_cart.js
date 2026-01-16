@@ -62,18 +62,12 @@ $(document).ready(function() {
         }
     }
 
-    // Handle Add to Cart button click
-    $(document).on('click', '.cart-btn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const $button = $(this);
+    // Get book ID from cart button or its parent elements
+    function getBookId($button) {
         const $productItem = $button.closest('.product-item, .wishlist-item');
-
-        // Try multiple ways to get book ID
         let bookId = null;
 
-        // Method 1: From wishlist button (all-books page)
+        // Method 1: From wishlist button in same product-actions div
         bookId = $productItem.find('.wishlist-btn').data('book-id');
 
         // Method 2: From remove-wishlist button (wishlist page)
@@ -81,18 +75,37 @@ $(document).ready(function() {
             bookId = $productItem.find('.remove-wishlist-btn').data('book-id');
         }
 
-        // Method 3: From parent wishlist-item data attribute (wishlist page)
+        // Method 3: From parent wishlist-item data attribute
         if (!bookId) {
             bookId = $productItem.attr('data-book-id');
         }
 
-        // Method 4: From closest element with data-book-id
+        // Method 4: From any sibling element with data-book-id
+        if (!bookId) {
+            const $siblingWithId = $button.siblings('[data-book-id]');
+            if ($siblingWithId.length > 0) {
+                bookId = $siblingWithId.first().data('book-id');
+            }
+        }
+
+        // Method 5: From closest element with data-book-id
         if (!bookId) {
             const $parent = $button.closest('[data-book-id]');
             if ($parent.length > 0) {
                 bookId = $parent.data('book-id');
             }
         }
+
+        return bookId;
+    }
+
+    // Handle Add to Cart button click
+    $(document).on('click', '.cart-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $button = $(this);
+        const bookId = getBookId($button);
 
         console.log('Cart button clicked, Book ID:', bookId);
 

@@ -41,6 +41,62 @@ public class BookService {
     @Autowired
     private SupabaseStorageService supabaseStorageService;
 
+    @Autowired
+    private OrderService orderService;
+
+    // Convert Book to BookInfo with purchased status for a specific user
+    public BookInfo convertToBookInfo(Book book, UUID userId) {
+        BookInfo bookInfo = convertToBookInfo(book);
+
+        // Check if user has purchased this book
+        if (userId != null) {
+            boolean isPurchased = orderService.hasUserPurchasedBook(userId, book.getId());
+            bookInfo.setPurchased(isPurchased);
+        }
+
+        return bookInfo;
+    }
+
+    // Original conversion without user context (for admin pages)
+    public BookInfo convertToBookInfo(Book book) {
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setBook_id(book.getId().toString());
+        bookInfo.setTitle(book.getTitle());
+        bookInfo.setImage(book.getImage());
+        bookInfo.setDescription(book.getDescription());
+
+        // Format published_date
+        if (book.getPublished_date() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            bookInfo.setPublished_date(book.getPublished_date().format(formatter));
+        }
+
+        bookInfo.setPage(book.getPage() != null ? book.getPage().toString() : "N/A");
+        bookInfo.setPrice(book.getPrice());
+        bookInfo.setBook_content(book.getBook_content());
+
+        // Format last_updated
+        if (book.getLast_updated() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+            bookInfo.setLast_updated(book.getLast_updated().format(formatter));
+        }
+
+        // Set author name
+        if (book.getAuthor() != null) {
+            bookInfo.setAuthor_name(book.getAuthor().getName());
+        }
+
+        // Set category name and ID
+        if (book.getCategory() != null) {
+            bookInfo.setCategory_name(book.getCategory().getName());
+            bookInfo.setCategory_id(book.getCategory().getId().toString());
+        }
+
+        bookInfo.setPurchased(false); // Default to false when no user context
+
+        return bookInfo;
+    }
+
     // Get paginated books with search support
     public Page<BookInfo> getBooksInfoPaginated(int page, int size, String searchBy, String searchQuery) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
@@ -61,6 +117,13 @@ public class BookService {
         }
 
         return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Get paginated books for customer with purchased status
+    public Page<BookInfo> getBooksInfoPaginatedForUser(int page, int size, UUID userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findAllBooks(pageable);
+        return bookPage.map(book -> convertToBookInfo(book, userId));
     }
 
     // Get books by author ID
@@ -119,6 +182,58 @@ public class BookService {
     public BookInfo getBookInfoById(UUID id) {
         Book book = getBookById(id);
         return convertToBookInfo(book);
+    }
+
+    // Get book info by ID for specific user
+    public BookInfo getBookInfoByIdForUser(UUID id, UUID userId) {
+        Book book = getBookById(id);
+        return convertToBookInfo(book, userId);
+    }
+
+    // Search books by title or author
+    public Page<BookInfo> searchBooksPaginated(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByTitleOrAuthorContaining(query, pageable);
+        return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Search books by title or author for specific user
+    public Page<BookInfo> searchBooksPaginatedForUser(String query, int page, int size, UUID userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByTitleOrAuthorContaining(query, pageable);
+        return bookPage.map(book -> convertToBookInfo(book, userId));
+    }
+
+    // Get books by category
+    public Page<BookInfo> getBooksByCategoryPaginated(Long categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.map(this::convertToBookInfo);
+    }
+
+    // Get books by category for specific user
+    public Page<BookInfo> getBooksByCategoryPaginatedForUser(Long categoryId, int page, int size, UUID userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.map(book -> convertToBookInfo(book, userId));
+    }
+
+    // Get books by category ID (limited results for related books)
+    public List<BookInfo> getBooksByCategoryId(Long categoryId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.getContent().stream()
+                .map(this::convertToBookInfo)
+                .collect(Collectors.toList());
+    }
+
+    // Get books by category ID for specific user
+    public List<BookInfo> getBooksByCategoryIdForUser(Long categoryId, int limit, UUID userId) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("last_updated").descending());
+        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
+        return bookPage.getContent().stream()
+                .map(book -> convertToBookInfo(book, userId))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -347,69 +462,6 @@ public class BookService {
         }
 
         bookRepository.delete(book);
-    }
-
-    public BookInfo convertToBookInfo(Book book) {
-        BookInfo bookInfo = new BookInfo();
-        bookInfo.setBook_id(book.getId().toString());
-        bookInfo.setTitle(book.getTitle());
-        bookInfo.setImage(book.getImage());
-        bookInfo.setDescription(book.getDescription());
-
-        // Format published_date
-        if (book.getPublished_date() != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookInfo.setPublished_date(book.getPublished_date().format(formatter));
-        }
-
-        bookInfo.setPage(book.getPage() != null ? book.getPage().toString() : "N/A");
-        bookInfo.setPrice(book.getPrice());
-        bookInfo.setBook_content(book.getBook_content());
-
-        // Format last_updated
-        if (book.getLast_updated() != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
-            bookInfo.setLast_updated(book.getLast_updated().format(formatter));
-        }
-
-        // Set author name
-        if (book.getAuthor() != null) {
-            bookInfo.setAuthor_name(book.getAuthor().getName());
-        }
-
-        // Set category name and ID
-        if (book.getCategory() != null) {
-            bookInfo.setCategory_name(book.getCategory().getName());
-            bookInfo.setCategory_id(book.getCategory().getId().toString());  // Add this line
-        }
-
-        return bookInfo;
-    }
-
-    // Search books by title or author
-    public Page<BookInfo> searchBooksPaginated(String query, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
-
-        // Search in both title and author name
-        Page<Book> bookPage = bookRepository.findByTitleOrAuthorContaining(query, pageable);
-
-        return bookPage.map(this::convertToBookInfo);
-    }
-
-    // Get books by category
-    public Page<BookInfo> getBooksByCategoryPaginated(Long categoryId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("last_updated").descending());
-        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
-        return bookPage.map(this::convertToBookInfo);
-    }
-
-    // Get books by category ID (limited results for related books)
-    public List<BookInfo> getBooksByCategoryId(Long categoryId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by("last_updated").descending());
-        Page<Book> bookPage = bookRepository.findByCategoryId(categoryId, pageable);
-        return bookPage.getContent().stream()
-                .map(this::convertToBookInfo)
-                .collect(Collectors.toList());
     }
 }
 

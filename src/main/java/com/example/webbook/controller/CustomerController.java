@@ -79,13 +79,9 @@ public class CustomerController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User currentUser = userDetails.getUser();
 
-            // Set the user ID from the authenticated user
             updateUserForm.setId(currentUser.getId().toString());
-
-            // Update user
             User updatedUser = userService.updateProfile(updateUserForm);
 
-            // Return success response with updated user data
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Profile updated successfully!");
@@ -110,25 +106,24 @@ public class CustomerController {
             Model model,
             Authentication authentication) {
 
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
         Page<BookInfo> bookPage;
 
-        // Filter by category or search
+        // Filter by category or search with user context
         if (categoryId != null) {
-            bookPage = bookService.getBooksByCategoryPaginated(categoryId, page, size);
+            bookPage = bookService.getBooksByCategoryPaginatedForUser(categoryId, page, size, user.getId());
         } else if (search != null && !search.trim().isEmpty()) {
-            bookPage = bookService.searchBooksPaginated(search.trim(), page, size);
+            bookPage = bookService.searchBooksPaginatedForUser(search.trim(), page, size, user.getId());
         } else {
-            bookPage = bookService.getBooksInfoPaginated(page, size);
+            bookPage = bookService.getBooksInfoPaginatedForUser(page, size, user.getId());
         }
 
         // Pagination info
         int totalPages = bookPage.getTotalPages();
         int startPage = Math.max(0, page - 2);
         int endPage = Math.min(totalPages - 1, page + 2);
-
-        // Get current user from CustomUserDetails
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser(); // Get the actual User entity
 
         // Get wishlist book IDs for current user
         Set<String> wishlistBookIds = wishlistService.getWishlistBookIds(user.getId());
@@ -159,15 +154,15 @@ public class CustomerController {
             Authentication authentication) {
         try {
             UUID bookId = UUID.fromString(id);
-            BookInfo bookInfo = bookService.getBookInfoById(bookId);
-
-            List<BookInfo> relatedBooks = bookService.getBooksByCategoryId(
-                    Long.parseLong(bookInfo.getCategory_id()), 4
-            );
-            relatedBooks.removeIf(book -> book.getBook_id().equals(id));
-
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
+
+            BookInfo bookInfo = bookService.getBookInfoByIdForUser(bookId, user.getId());
+
+            List<BookInfo> relatedBooks = bookService.getBooksByCategoryIdForUser(
+                    Long.parseLong(bookInfo.getCategory_id()), 4, user.getId()
+            );
+            relatedBooks.removeIf(book -> book.getBook_id().equals(id));
 
             boolean isInWishlist = wishlistService.isInWishlist(user.getId(), bookId);
             Set<String> wishlistBookIds = wishlistService.getWishlistBookIds(user.getId());
@@ -203,11 +198,15 @@ public class CustomerController {
         // Get purchased books directly
         Set<Book> purchasedBooks = orderService.getPurchasedBooks(user.getId());
 
+        // Get wishlist book IDs - IMPORTANT: Add this line
+        Set<String> wishlistBookIds = wishlistService.getWishlistBookIds(user.getId());
+
         Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
-        long wishlistCount = wishlistService.getWishlistBookIds(user.getId()).size();
+        long wishlistCount = wishlistBookIds.size();
 
         model.addAttribute("purchasedBooks", purchasedBooks);
         model.addAttribute("currentUser", user);
+        model.addAttribute("wishlistBookIds", wishlistBookIds);
         model.addAttribute("cartSummary", cartSummary);
         model.addAttribute("wishlistCount", wishlistCount);
 
@@ -219,5 +218,37 @@ public class CustomerController {
         }
 
         return "users/customer/my_books";
+    }
+
+    /**
+     * New endpoint to view/read purchased book
+     */
+    @GetMapping("/read/{id}")
+    public String readBook(@PathVariable("id") String id, Model model, Authentication authentication) {
+        try {
+            UUID bookId = UUID.fromString(id);
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.getUser();
+
+            // Check if user has purchased this book
+            if (!orderService.hasUserPurchasedBook(user.getId(), bookId)) {
+                model.addAttribute("error", "You haven't purchased this book yet");
+                return "redirect:/customer/book/" + id;
+            }
+
+            Book book = bookService.getBookById(bookId);
+
+            Map<String, Object> cartSummary = cartService.getCartSummary(user.getId());
+            long wishlistCount = wishlistService.getWishlistBookIds(user.getId()).size();
+
+            model.addAttribute("book", book);
+            model.addAttribute("cartSummary", cartSummary);
+            model.addAttribute("wishlistCount", wishlistCount);
+
+            return "users/customer/read_book";
+        } catch (Exception e) {
+            model.addAttribute("error", "Book not found");
+            return "redirect:/customer/my-books";
+        }
     }
 }

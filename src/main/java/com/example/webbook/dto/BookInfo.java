@@ -13,6 +13,15 @@ public class BookInfo {
     private String author_name;
     private String category_name;
     private String category_id;
+    private boolean purchased;
+
+    public boolean isPurchased() {
+        return purchased;
+    }
+
+    public void setPurchased(boolean purchased) {
+        this.purchased = purchased;
+    }
 
     public String getCategory_id() {
         return category_id;
